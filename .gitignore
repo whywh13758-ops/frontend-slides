@@ -4,3 +4,5 @@ films/*/score.wav
 films/*/render.log
 films/*/.frames*
 films/*/_frames/
+films/*/*.render.json
+films/*/*.mp4
