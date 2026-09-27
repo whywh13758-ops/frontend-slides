@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>多彩开场 · Color Intro</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  body { display: grid; place-items: center; }
+  canvas { width: 100vw; height: 56.25vw; max-height: 100vh; max-width: 177.78vh; display: block; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+/*
+ * 30-second colorful opening — every frame is a pure function of time t (seconds),
+ * so the same page is used both for live preview and for frame-exact video export
+ * (see render.mjs, which calls window.renderFrame(t)).
+ *
+ * Scenes
+ *   0–4   Ignition   : a single point of light bursts into rainbow rays
+ *   4–9   Prism      : white beam split into the spectrum
+ *   9–15  Galaxy     : color particles swirl, then assemble into “色彩”
+ *   15–21 Beats      : full-screen color panels on the beat
+ *   21–26 Tunnel     : kaleidoscope rings flying toward the camera
+ *   26–30 Title      : “多彩开场” logo reveal
+ */
+const W = 1920, H = 1080, CX = W / 2, CY = H / 2;
+const DURATION = 30;
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+const CN = '"WenQuanYi Zen Hei", "PingFang SC", "Microsoft YaHei", sans-serif';
+const EN = '"Helvetica Neue", Arial, "DejaVu Sans", sans-serif';
+
+// ---------- helpers ----------
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const easeOutCubic = k => 1 - Math.pow(1 - k, 3);
+const easeInOutCubic = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const easeOutExpo = k => k >= 1 ? 1 : 1 - Math.pow(2, -10 * k);
+const easeOutBack = k => { const c = 1.9; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); };
+const hsl = (h, s, l, a = 1) => `hsla(${((h % 360) + 360) % 360},${s}%,${l}%,${a})`;
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const RAINBOW = [0, 28, 52, 130, 185, 225, 280];
+
+function glowLine(x1, y1, x2, y2, color, w, alpha) {
+  ctx.lineCap = 'round';
+  for (const [m, a] of [[6, .08], [3, .18], [1.4, .5], [.6, 1]]) {
+    ctx.strokeStyle = color(alpha * a);
+    ctx.lineWidth = w * m;
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+  }
+}
+function glowDot(x, y, r, color, alpha) {
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, color(alpha)); g.addColorStop(.25, color(alpha * .45)); g.addColorStop(1, color(0));
+  ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2);
+}
+function clear(c = '#000') { ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; ctx.fillStyle = c; ctx.fillRect(0, 0, W, H); }
+
+// ---------- precomputed data ----------
+const R = rng(7);
+const sparks = Array.from({ length: 420 }, () => ({ a: R() * Math.PI * 2, v: 300 + R() * 1100, h: R() * 360, s: 1 + R() * 3 }));
+const beamDots = Array.from({ length: 260 }, () => ({ band: Math.floor(R() * 7), off: R(), sp: .25 + R() * .35, w: R() - .5 }));
+let galaxy = [];
+
+function buildGalaxy() {
+  // sample the pixels of “色彩” as particle targets
+  const oc = document.createElement('canvas'); oc.width = W; oc.height = H;
+  const o = oc.getContext('2d');
+  o.fillStyle = '#fff'; o.textAlign = 'center'; o.textBaseline = 'middle';
+  o.font = `900 430px ${CN}`;
+  o.fillText('色彩', CX, CY - 10);
+  const d = o.getImageData(0, 0, W, H).data, pts = [];
+  for (let y = 0; y < H; y += 7) for (let x = 0; x < W; x += 7) if (d[(y * W + x) * 4 + 3] > 128) pts.push([x, y]);
+  const r = rng(42), N = 3200;
+  galaxy = Array.from({ length: N }, (_, i) => {
+    const p = pts.length ? pts[Math.floor(r() * pts.length)] : [CX, CY];
+    const arm = i % 3;
+    return {
+      tx: p[0] + (r() - .5) * 4, ty: p[1] + (r() - .5) * 4,
+      r0: 40 + Math.pow(r(), .7) * 820, arm, j: (r() - .5) * .7,
+      d: r() * .7, ph: r() * 6.28, s: 1.4 + r() * 2.8,
+    };
+  });
+}
+
+// ---------- scenes ----------
+function sceneIgnition(t) {
+  clear('#030208');
+  ctx.globalCompositeOperation = 'lighter';
+  // core dot
+  const born = easeOutCubic(prog(t, .2, 1));
+  const pulse = 1 + .25 * Math.sin(t * 18) * (1 - prog(t, .8, 1));
+  glowDot(CX, CY, (20 + 140 * born) * pulse * (1 + prog(t, 1, 1.3) * 2), a => `rgba(255,255,255,${a})`, born);
+  if (t < 1) return;
+  const u = t - 1;
+  // expanding hue rings
+  for (let k = 0; k < 8; k++) {
+    const t0 = k * .35, v = u - t0; if (v < 0) continue;
+    const rad = easeOutExpo(clamp(v / 2.2)) * 1400, a = 1 - clamp(v / 2.2);
+    ctx.strokeStyle = hsl(RAINBOW[k % 7], 100, 60, a * .8); ctx.lineWidth = 6 + 20 * a;
+    ctx.beginPath(); ctx.arc(CX, CY, rad, 0, 7); ctx.stroke();
+  }
+  // rainbow rays
+  const len = easeOutExpo(clamp(u / 1.2)) * 1400;
+  for (let j = 0; j < 14; j++) {
+    const ang = j * Math.PI / 7 + u * .5 * (j % 2 ? 1 : -.6), h = RAINBOW[j % 7];
+    glowLine(CX, CY, CX + Math.cos(ang) * len, CY + Math.sin(ang) * len, a => hsl(h, 100, 62, a), j % 2 ? 4 : 9, 1);
+  }
+  // sparks
+  for (const s of sparks) {
+    const dist = s.v * (1 - Math.exp(-u * 1.6)) / 1.6 * 1.4, a = 1 - clamp(u / 3);
+    const x = CX + Math.cos(s.a) * dist, y = CY + Math.sin(s.a) * dist;
+    ctx.fillStyle = hsl(s.h, 100, 65, a); ctx.fillRect(x, y, s.s * 2, s.s * 2);
+  }
+  glowDot(CX, CY, 260, a => `rgba(255,255,255,${a})`, .9 * (1 - clamp(u / 2)));
+  // tagline
+  ctx.globalCompositeOperation = 'source-over';
+  const ta = prog(t, 1.8, 2.4) * (1 - prog(t, 3.5, 3.9));
+  ctx.fillStyle = `rgba(255,255,255,${ta})`; ctx.textAlign = 'center';
+  ctx.font = `700 64px ${CN}`; ctx.fillText('一 束 光', CX, CY + 330);
+  ctx.font = `600 22px ${EN}`; ctx.fillStyle = `rgba(255,255,255,${ta * .7})`;
+  ctx.fillText('O N E   L I G H T', CX, CY + 380);
+}
+
+function sceneprism(t) {
+  const u = t - 4;
+  clear('#04030a');
+  ctx.save();
+  const z = 1 + u * .035; ctx.translate(CX, CY); ctx.scale(z, z); ctx.translate(-CX, -CY);
+  const P = [[960, 330], [770, 660], [1150, 660]];
+  const inX = 868, inY = 500, outX = 1058, outY = 505;
+  // white beam
+  const bk = easeInOutCubic(prog(u, .1, 1.1));
+  ctx.globalCompositeOperation = 'lighter';
+  glowLine(-100, 640, lerp(-100, inX, bk), lerp(640, inY, bk), a => `rgba(255,255,255,${a})`, 7, 1);
+  // spectrum fan
+  const fk = easeOutCubic(prog(u, 1.05, 2.1));
+  const spread = .30 + .05 * Math.sin(u * 1.3);
+  if (fk > 0) {
+    const L = 1400 * fk;
+    for (let b = 0; b < 7; b++) {
+      const a0 = -spread / 2 + .1 + b * spread / 7, a1 = a0 + spread / 7;
+      const g = ctx.createLinearGradient(outX, outY, outX + L, outY);
+      g.addColorStop(0, hsl(RAINBOW[b], 100, 60, .95)); g.addColorStop(1, hsl(RAINBOW[b] + 10, 100, 55, .55));
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.moveTo(outX, outY - 3 + b); ctx.lineTo(outX + Math.cos(a0) * L, outY + Math.sin(a0) * L);
+      ctx.lineTo(outX + Math.cos(a1) * L, outY + Math.sin(a1) * L); ctx.closePath(); ctx.fill();
+    }
+    // travelling light dots
+    for (const d of beamDots) {
+      const k = (d.off + u * d.sp) % 1, a = (-spread / 2 + .1 + (d.band + .5 + d.w * .8) * spread / 7);
+      const x = outX + Math.cos(a) * k * L, y = outY + Math.sin(a) * k * L;
+      glowDot(x, y, 16, al => `rgba(255,255,255,${al})`, .7 * fk);
+    }
+  }
+  // inner refraction
+  if (bk >= 1) glowLine(inX, inY, outX, outY, a => `rgba(255,255,255,${a})`, 4, .6);
+  // prism body
+  ctx.globalCompositeOperation = 'source-over';
+  const pk = easeOutCubic(prog(u, 0, .8));
+  const g = ctx.createLinearGradient(770, 330, 1150, 660);
+  g.addColorStop(0, `rgba(255,255,255,${.16 * pk})`); g.addColorStop(1, `rgba(140,160,255,${.05 * pk})`);
+  ctx.fillStyle = g;
+  ctx.beginPath(); P.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath(); ctx.fill();
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < 3; i++) glowLine(...P[i], ...P[(i + 1) % 3], a => `rgba(220,230,255,${a})`, 3, pk);
+  ctx.restore();
+  // caption
+  ctx.globalCompositeOperation = 'source-over';
+  const ta = prog(u, 2.3, 3) * (1 - prog(u, 4.4, 4.9));
+  ctx.textAlign = 'left';
+  ctx.fillStyle = `rgba(255,255,255,${ta})`; ctx.font = `700 58px ${CN}`;
+  ctx.fillText('每一束光', 150, 880 - 20 * (1 - ta));
+  ctx.fillStyle = `rgba(255,255,255,${ta * .75})`; ctx.font = `400 40px ${CN}`;
+  ctx.fillText('都藏着一道彩虹', 150, 945 - 20 * (1 - ta));
+}
+
+function sceneGalaxy(t) {
+  const u = t - 9;
+  clear('#030208');
+  const bg = ctx.createRadialGradient(CX, CY, 0, CX, CY, 900);
+  bg.addColorStop(0, hsl(260 + u * 20, 70, 14, 1)); bg.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  ctx.globalCompositeOperation = 'lighter';
+  const boom = prog(u, 5.35, 6);
+  for (let i = 0; i < galaxy.length; i++) {
+    const p = galaxy[i];
+    const ang = p.arm * 2.094 + p.r0 * .0055 + p.j + u * (1.4 * 260 / (p.r0 + 160));
+    const gx = CX + Math.cos(ang) * p.r0 * (1 + .04 * Math.sin(u * 2 + p.ph));
+    const gy = CY + Math.sin(ang) * p.r0 * .62;
+    const k = easeInOutCubic(prog(u, 2.1 + p.d, 3.9 + p.d));
+    let x = lerp(gx, p.tx + Math.sin(u * 3 + p.ph) * 1.5 * k, k);
+    let y = lerp(gy, p.ty + Math.cos(u * 3 + p.ph) * 1.5 * k, k);
+    if (boom > 0) {
+      const dx = x - CX, dy = y - CY, dl = Math.hypot(dx, dy) + 1;
+      const f = boom * boom * 1800;
+      x += dx / dl * f; y += dy / dl * f;
+    }
+    const h = lerp(p.arm * 120 + p.r0 * .35 + u * 50, x / W * 360 + u * 90, k);
+    const a = 1 - boom * .8;
+    ctx.fillStyle = hsl(h, 100, 62, a);
+    ctx.fillRect(x - p.s / 2, y - p.s / 2, p.s, p.s);
+    if (i % 3 === 0) { ctx.fillStyle = hsl(h, 100, 60, .12 * a); ctx.fillRect(x - p.s * 2, y - p.s * 2, p.s * 4, p.s * 4); }
+  }
+  // core glow while swirling
+  glowDot(CX, CY, 300, a => hsl(300 + u * 40, 100, 70, a), .5 * (1 - prog(u, 2, 3.5)));
+  // English label under the word
+  ctx.globalCompositeOperation = 'source-over';
+  const ta = prog(u, 4, 4.5) * (1 - prog(u, 5.2, 5.5));
+  ctx.textAlign = 'center'; ctx.fillStyle = `rgba(255,255,255,${ta * .85})`;
+  ctx.font = `600 30px ${EN}`; ctx.fillText('C  O  L  O  R', CX, CY + 300);
+}
+
+const BEAT_WORDS = [['红', 'RED'], ['橙', 'ORANGE'], ['黄', 'YELLOW'], ['绿', 'GREEN'], ['青', 'CYAN'], ['蓝', 'BLUE'], ['紫', 'VIOLET']];
+function panelColor(b) { return RAINBOW[((b % 7) + 7) % 7]; }
+function sceneBeats(t) {
+  const u = t - 15;
+  if (u < 3.5) {
+    const b = Math.floor(u / .5), k = (u - b * .5) / .5;
+    const h = panelColor(b), hPrev = panelColor(b - 1);
+    clear(b === 0 ? '#000' : hsl(hPrev, 95, b === 2 ? 52 : 55));
+    // diagonal wipe of new panel
+    const w = easeOutExpo(clamp(k / .45));
+    ctx.fillStyle = hsl(h, 95, b === 2 ? 52 : 55);
+    ctx.beginPath(); const x = lerp(-600, W + 600, w);
+    ctx.moveTo(-600, 0); ctx.lineTo(x + 400, 0); ctx.lineTo(x - 400, H); ctx.lineTo(-600, H); ctx.fill();
+    // complementary ring + stripes
+    ctx.save(); ctx.translate(CX, CY); ctx.rotate(u * .8 + b);
+    ctx.strokeStyle = hsl(h + 180, 90, 60, .9); ctx.lineWidth = 34;
+    ctx.beginPath(); ctx.arc(0, 0, 330 + 40 * (1 - easeOutCubic(k)), 0, Math.PI * 1.5); ctx.stroke();
+    ctx.fillStyle = hsl(h + 30, 100, 70, .35);
+    for (let s = -6; s <= 6; s++) ctx.fillRect(s * 70 - 12, -620, 24, 1240 * w);
+    ctx.restore();
+    // word
+    const s = 1.25 - .25 * easeOutCubic(clamp(k / .5));
+    const [zh, en] = BEAT_WORDS[b % 7];
+    ctx.save(); ctx.translate(CX, CY); ctx.scale(s, s); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = `900 380px ${CN}`;
+    ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fillText(zh, 14, 0);
+    ctx.fillStyle = '#fff'; ctx.fillText(zh, 0, -14);
+    ctx.font = `800 44px ${EN}`; ctx.fillText(en.split('').join(' '), 0, 250);
+    ctx.restore();
+  } else {
+    // fast section: sliding spectrum bars
+    const v = u - 3.5;
+    clear('#000');
+    const n = 14, bh = H / n;
+    for (let i = 0; i < n; i++) {
+      const dir = i % 2 ? 1 : -1, off = (v * 900 * dir + i * 137) % 480;
+      for (let x = -480; x < W + 480; x += 240) {
+        ctx.fillStyle = hsl(RAINBOW[(i + Math.floor((x + 480) / 240)) % 7] + v * 60, 100, 56);
+        ctx.fillRect(x + off, i * bh, 236, bh - 4);
+      }
+    }
+    const f = Math.floor(v / .25), fk = (v - f * .25) / .25;
+    const words = ['无', '限', '色', '彩', '∞', '色', '彩', '绽', '放', '！'];
+    ctx.fillStyle = 'rgba(0,0,0,.82)';
+    const bw = 560 * (1 + .08 * (1 - fk));
+    ctx.fillRect(CX - bw / 2, CY - bw / 2, bw, bw);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = hsl(RAINBOW[f % 7], 100, 62); ctx.font = `900 400px ${CN}`;
+    ctx.fillText(words[f % words.length], CX, CY + 10);
+  }
+}
+
+function sceneTunnel(t) {
+  const u = t - 21;
+  clear('#020106');
+  const cx = CX + Math.sin(u * 1.1) * 60, cy = CY + Math.cos(u * .9) * 40;
+  ctx.globalCompositeOperation = 'lighter';
+  // rotating rays
+  for (let j = 0; j < 24; j++) {
+    const a = j * Math.PI / 12 + u * .35;
+    const g = ctx.createLinearGradient(cx, cy, cx + Math.cos(a) * 1300, cy + Math.sin(a) * 1300);
+    g.addColorStop(0, hsl(j * 15 + u * 80, 100, 60, 0)); g.addColorStop(1, hsl(j * 15 + u * 80, 100, 60, .35));
+    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(a - .04) * 1500, cy + Math.sin(a - .04) * 1500);
+    ctx.lineTo(cx + Math.cos(a + .04) * 1500, cy + Math.sin(a + .04) * 1500); ctx.fill();
+  }
+  // rings flying toward camera
+  const N = 34, speed = .42;
+  const rings = [];
+  for (let i = 0; i < N; i++) {
+    const z = 1 - (((i / N) + u * speed) % 1);
+    rings.push({ i, z });
+  }
+  rings.sort((a, b) => b.z - a.z);
+  for (const { i, z } of rings) {
+    const zz = Math.max(z, .015), r = 34 / zz;
+    if (r > 2600) continue;
+    const a = clamp((1 - z) * 2.2) * clamp(z * 6);
+    const sides = i % 3 === 0 ? 3 : 6, rot = u * (i % 2 ? .9 : -.7) + i * .3, h = i * 23 + u * 110;
+    ctx.strokeStyle = hsl(h, 100, 60, a); ctx.lineWidth = Math.max(1.5, r * .035);
+    ctx.beginPath();
+    for (let s = 0; s <= sides; s++) {
+      const aa = rot + s * Math.PI * 2 / sides;
+      const x = cx + Math.cos(aa) * r, y = cy + Math.sin(aa) * r;
+      s ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    }
+    ctx.stroke();
+    ctx.fillStyle = hsl(h + 60, 100, 70, a);
+    for (let s = 0; s < sides; s++) {
+      const aa = rot + s * Math.PI * 2 / sides;
+      ctx.beginPath(); ctx.arc(cx + Math.cos(aa) * r, cy + Math.sin(aa) * r, Math.max(2, r * .03), 0, 7); ctx.fill();
+    }
+  }
+  glowDot(cx, cy, 380, a => hsl(u * 110, 100, 75, a), .9);
+  // mirrored kaleidoscope petals
+  ctx.save(); ctx.translate(cx, cy);
+  for (let j = 0; j < 12; j++) {
+    ctx.save(); ctx.rotate(j * Math.PI / 6 - u * .6); if (j % 2) ctx.scale(1, -1);
+    const pr = 160 + 60 * Math.sin(u * 3);
+    ctx.fillStyle = hsl(j * 30 + u * 140, 100, 60, .35);
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(pr * .6, pr * .45, pr * 1.4, 0); ctx.quadraticCurveTo(pr * .6, -pr * .1, 0, 0); ctx.fill();
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+const orbs = Array.from({ length: 7 }, (_, i) => ({ h: RAINBOW[i], fx: .23 + i * .07, fy: .31 + i * .05, ph: i * 1.7 }));
+function sceneTitle(t) {
+  const u = t - 26;
+  clear('#05030b');
+  ctx.globalCompositeOperation = 'lighter';
+  for (const o of orbs) {
+    const x = CX + Math.sin(u * o.fx * 3 + o.ph) * 700, y = CY + Math.cos(u * o.fy * 3 + o.ph) * 360;
+    glowDot(x, y, 620, a => hsl(o.h + u * 30, 95, 55, a), .8);
+  }
+  // sparkles
+  const r = rng(99);
+  for (let i = 0; i < 160; i++) {
+    const x = r() * W, y = r() * H, ph = r() * 6.28, sp = 2 + r() * 5;
+    const a = Math.pow(.5 + .5 * Math.sin(u * sp + ph), 6) * prog(u, 1, 1.6);
+    glowDot(x, y, 14, al => `rgba(255,255,255,${al})`, a);
+  }
+  ctx.globalCompositeOperation = 'source-over';
+  // darken center for contrast
+  const vg = ctx.createRadialGradient(CX, CY, 0, CX, CY, 900);
+  vg.addColorStop(0, 'rgba(0,0,0,.45)'); vg.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+
+  const chars = ['多', '彩', '开', '场'], size = 230, gap = 250, y = CY - 40;
+  const grad = ctx.createLinearGradient(CX - 520, 0, CX + 520, 0);
+  for (let s = 0; s <= 6; s++) grad.addColorStop(s / 6, hsl(RAINBOW[s] + u * 60, 100, 62));
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = `900 ${size}px ${CN}`;
+  chars.forEach((ch, i) => {
+    const k = prog(u, .15 + i * .16, .75 + i * .16);
+    if (k <= 0) return;
+    const x = CX + (i - 1.5) * gap, sc = lerp(2.6, 1, easeOutBack(k)), off = (1 - easeOutCubic(k)) * 60 + 6 * Math.max(0, Math.sin(u * 20)) * prog(u, 3.3, 3.5);
+    ctx.save(); ctx.translate(x, y); ctx.scale(sc, sc); ctx.globalAlpha = clamp(k * 2);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = 'rgba(255,0,80,.8)'; ctx.fillText(ch, -off, 0);
+    ctx.fillStyle = 'rgba(0,200,255,.8)'; ctx.fillText(ch, off, 0);
+    ctx.restore();
+    // gradient lives in canvas space, so draw untransformed with a scaled font size
+    ctx.save(); ctx.globalAlpha = clamp(k * 2) * clamp((k - .3) / .5);
+    ctx.fillStyle = grad; ctx.font = `900 ${size * sc}px ${CN}`; ctx.fillText(ch, x, y);
+    ctx.restore();
+  });
+  // underline + subtitle
+  const lk = easeOutExpo(prog(u, 1.1, 2));
+  const lg = ctx.createLinearGradient(CX - 520, 0, CX + 520, 0);
+  RAINBOW.forEach((h, i) => lg.addColorStop(i / 6, hsl(h - u * 60, 100, 60)));
+  ctx.fillStyle = lg; ctx.fillRect(CX - 520 * lk, y + 160, 1040 * lk, 8);
+  const sk = prog(u, 1.4, 2.1);
+  ctx.fillStyle = `rgba(255,255,255,${sk})`; ctx.font = `600 34px ${EN}`;
+  ctx.letterSpacing = `${lerp(40, 16, easeOutCubic(sk))}px`;
+  ctx.fillText('COLOR YOUR WORLD', CX + 8, y + 235);
+  ctx.letterSpacing = '0px';
+}
+
+// ---------- compositor ----------
+function flash(t, T, color = '255,255,255', w = .14) {
+  const a = Math.exp(-Math.pow((t - T) / w, 2));
+  if (a < .01) return;
+  ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = `rgba(${color},${a})`; ctx.fillRect(0, 0, W, H);
+}
+function vignette() {
+  ctx.globalCompositeOperation = 'source-over';
+  const g = ctx.createRadialGradient(CX, CY, 500, CX, CY, 1200);
+  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.55)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+}
+function renderFrame(t) {
+  ctx.save();
+  if (t < 4) sceneIgnition(t);
+  else if (t < 9) sceneprism(t);
+  else if (t < 15) sceneGalaxy(t);
+  else if (t < 21) sceneBeats(t);
+  else if (t < 26) sceneTunnel(t);
+  else sceneTitle(t);
+  ctx.restore();
+  ctx.save();
+  vignette();
+  flash(t, 4); flash(t, 9); flash(t, 15, '255,255,255', .1); flash(t, 21, '255,255,255', .12); flash(t, 26, '255,255,255', .2);
+  // fade in / out
+  const fade = Math.max(1 - prog(t, 0, .3), prog(t, 29.2, 30));
+  if (fade > 0) { ctx.fillStyle = `rgba(0,0,0,${fade})`; ctx.fillRect(0, 0, W, H); }
+  ctx.restore();
+}
+window.renderFrame = renderFrame;
+window.DURATION = DURATION;
+
+window.ready = document.fonts.load(`900 100px ${CN}`, '色彩多开场').catch(() => {}).then(buildGalaxy);
+if (!location.search.includes('capture')) {
+  window.ready.then(() => {
+    const start = performance.now();
+    const loop = now => { renderFrame(((now - start) / 1000) % DURATION); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  });
+}
+</script>
+</body>
+</html>
