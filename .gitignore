@@ -1,0 +1,6 @@
+films/*/draft.mp4*
+films/*/film.mp4*
+films/*/score.wav
+films/*/render.log
+films/*/.frames*
+films/*/_frames/
