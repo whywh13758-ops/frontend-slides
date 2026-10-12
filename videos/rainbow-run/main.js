@@ -192,11 +192,11 @@
   fly('#run1', { z: -200 }, 13.45, 0.6, 'power2.out');
   mv(13.75, 2.0, { ...at('gC', -160, 210, 840), yaw: 2, roll: 0 }, 'sine.inOut');
   fly('#run2', { x: 900, z: -800, rotationY: -50 }, 15.55, 0.9, 'power3.out');
-  mv(15.75, 1.3, { ...at('gC', 40, 10, 1340), yaw: 0 }, 'power3.inOut');
-  fly('#pillC', { x: -260 }, 16.05, 0.6, 'power3.out');
-  fly('#banC', { x: -360, rotationY: 70 }, 16.25, 0.7, 'power3.out');
-  shake(16.55, 0.3);
-  mv(17.05, 1.3, { ...at('gC', 70, 10, 1290), yaw: 1 }, 'sine.inOut');
+  mv(15.75, 1.3, { ...at('gC', 40, -20, 1340), yaw: 0 }, 'power3.inOut');
+  fly('#pillC', { x: -260 }, 16.5, 0.6, 'power3.out');
+  fly('#banC', { x: -360, rotationY: 70 }, 16.7, 0.7, 'power3.out');
+  shake(17.0, 0.3);
+  mv(17.05, 1.3, { ...at('gC', 50, -20, 1300), yaw: 0.5 }, 'sine.inOut');
 
   // crane down → 0.1元装备包
   mv(18.35, 0.85, { ...at('gC2', 0, 0, 1440), yaw: 0, pitch: 0 }, 'power3.inOut');
@@ -270,7 +270,7 @@
   /* ---- F · 冰雪女王 (37.6 – 44.3) ---- */
   cut(37.6, { ...at('gF', 20, -1350, 1420), pitch: -40, yaw: 0, roll: 0 });
   mv(37.6, 2.3, { ...at('gF', 20, 10, 1360), pitch: 0 }, 'power3.inOut');
-  mv(39.9, 4.4, { ...at('gF', 90, 10, 1230), yaw: 2 }, 'sine.inOut');
+  mv(39.9, 4.4, { ...at('gF', 30, 0, 1250), yaw: 0.5 }, 'sine.inOut');
   fly('#frozen1', { z: -500, rotationY: 35 }, 37.65, 0.9, 'power3.out');
   fly('#frozen2', { z: -500, rotationY: -35 }, 37.95, 0.9, 'power3.out');
   fly('#gF .flake', { scale: 0, rotation: -90 }, 37.7, 0.9, 'back.out(1.5)', 0.08);
