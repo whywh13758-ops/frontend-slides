@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>亲子彩虹跑 · 宣传片 v4</title>
+<link rel="stylesheet" href="../fonts/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-7.2 7-12.5A7 7 0 0 0 5 9.5C5 14.8 12 22 12 22Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="9.5" r="2.5" fill="currentColor"/></symbol>
+    <symbol id="i-fire" viewBox="0 0 24 24"><path d="M12 2c1 4 5 5.5 5 10.5a5 5 0 0 1-10 0c0-2.4 1.3-3.8 2.4-5 .2 1.6 1 2.6 2.1 3C11 8 11.2 4.6 12 2Z" fill="currentColor"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5Z" fill="currentColor"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4.5" width="4" height="15" rx="1.2" fill="currentColor"/><rect x="14" y="4.5" width="4" height="15" rx="1.2" fill="currentColor"/></symbol>
+    <symbol id="i-prev" viewBox="0 0 24 24"><path d="M18 5v14L8.5 12Z" fill="currentColor"/><rect x="5" y="5" width="2.6" height="14" rx="1" fill="currentColor"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="M6 5v14l9.5-7Z" fill="currentColor"/><rect x="16.4" y="5" width="2.6" height="14" rx="1" fill="currentColor"/></symbol>
+    <symbol id="i-vol" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4Z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 4h10v5a5 5 0 0 1-10 0Z" fill="currentColor"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 14v4M8 20h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6.5" cy="18" r="2.6" fill="currentColor"/><circle cx="16.5" cy="16" r="2.6" fill="currentColor"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19.5 7" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10C19.5 15.4 12 20 12 20Z" fill="currentColor"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M5 13v6h14v-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <linearGradient id="rbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7aa8"/><stop offset=".3" stop-color="#ffb35c"/><stop offset=".55" stop-color="#ffe66b"/><stop offset=".75" stop-color="#6fd8ff"/><stop offset="1" stop-color="#8f7bff"/></linearGradient>
+  </defs>
+</svg>
+
+<div id="viewport"><div id="stage">
+  <div class="layer" id="bg">
+    <div class="sky"></div><div class="sun"></div>
+    <div class="cl c1"></div><div class="cl c2"></div><div class="cl c3"></div><div class="cl c4"></div>
+    <div class="burst"></div>
+    <div class="night"></div>
+  </div>
+  <canvas id="fxBack" width="1920" height="1080"></canvas>
+
+  <div id="cam">
+    <div id="eq"></div>
+
+    <div id="island">
+      <!-- search bar + suggestions -->
+      <div class="L" id="Lsearch">
+        <svg class="ic"><use href="#i-search"/></svg>
+        <span class="q"><span id="qtext"></span><i class="caret"></i></span>
+        <span class="ph" id="qph">搜索 吉安周末好去处</span>
+        <svg class="mic"><use href="#i-mic"/></svg>
+      </div>
+      <div class="L" id="Lsug">
+        <div class="sep"></div>
+        <div class="hover" id="sugHover"></div>
+        <div class="set" id="sugA">
+          <div class="row"><svg><use href="#i-search"/></svg><span><b>吉安</b>怎么样</span></div>
+          <div class="row"><svg><use href="#i-search"/></svg><span><b>吉安</b>10月17日有什么活动</span></div>
+          <div class="row"><svg><use href="#i-search"/></svg><span><b>吉安</b>周末去哪儿玩</span></div>
+          <div class="row"><svg><use href="#i-pin"/></svg><span><b>吉安</b>新世界广场来斯百货</span></div>
+        </div>
+        <div class="set" id="sugB">
+          <div class="row"><svg><use href="#i-search"/></svg><span><b>吉安周末</b>去哪儿玩</span></div>
+          <div class="row"><svg><use href="#i-search"/></svg><span><b>吉安周末</b>亲子活动</span></div>
+          <div class="row"><svg><use href="#i-search"/></svg><span><b>吉安周末</b>带娃好去处</span></div>
+          <div class="row hot"><svg><use href="#i-fire"/></svg><span>听说 <b>吉安周末</b>有大事发生？</span><em>热</em></div>
+        </div>
+      </div>
+      <div class="L" id="Lspin"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="20" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="5"/><path d="M30 10a20 20 0 0 1 20 20" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg></div>
+      <div class="L" id="Lcheck"><svg viewBox="0 0 24 24"><path id="checkPath" d="M5 12.5 10 17.5 19.5 7" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <!-- “青鸟飞鱼来了！” pill -->
+      <div class="L" id="Lpill">
+        <div class="art round"><img class="huhu" src="../assets/huhu.png" alt=""><div class="holdart"></div></div>
+        <div class="tt"><b>青鸟飞鱼来了！</b><span>10月17日 · 吉安新世界广场来斯百货</span></div>
+        <div class="wave"><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+
+      <!-- music player -->
+      <div class="L" id="Lplayer">
+        <div class="art"><img class="huhu" src="../assets/huhu.png" alt=""><div class="holdart"></div></div>
+        <div class="meta"><b>此生不换</b><span>青鸟飞鱼 · 仙剑奇侠传3 插曲</span></div>
+        <div class="liked"><svg><use href="#i-heart"/></svg></div>
+        <div class="prog"><div class="track"><i id="pFill"></i><u id="pKnob"></u></div><span class="t0" id="pT0">0:00</span><span class="t1" id="pT1">-4:18</span></div>
+        <div class="ctrl">
+          <svg class="b"><use href="#i-prev"/></svg>
+          <div class="pp"><svg class="play"><use href="#i-play"/></svg><svg class="pause"><use href="#i-pause"/></svg></div>
+          <svg class="b"><use href="#i-next"/></svg>
+        </div>
+        <div class="vol"><svg><use href="#i-vol"/></svg><div class="vtrack"><i id="vFill"></i><u id="vKnob"></u></div><span id="vNum">20</span></div>
+      </div>
+
+      <!-- star guest -->
+      <div class="L" id="Lstar">
+        <div class="photo"><img class="huhu" src="../assets/huhu.png" alt=""><div class="holdart big"><em>虎虎 · 照片位</em></div></div>
+        <div class="col">
+          <div class="lab"><span class="scr">STAR GUEST</span><i></i><span>10月17日 · 明星见面会</span></div>
+          <div class="nm"><span class="n1 split">青鸟飞鱼</span><span class="n2 split">虎虎</span></div>
+          <div class="chip">合生元品牌好友</div>
+          <div class="rows">
+            <div class="hover" id="starHover"></div>
+            <div class="row"><svg><use href="#i-note"/></svg><span>仙剑奇侠传3插曲<b>《此生不换》</b>演唱者</span></div>
+            <div class="row"><svg><use href="#i-trophy"/></svg><span>组合曾获 <b>音乐风云榜最佳新人EP</b></span></div>
+            <div class="row"><svg><use href="#i-trophy"/></svg><span>组合曾获 <b>第17届东方风云榜·东方新人银奖</b></span></div>
+          </div>
+          <div class="now"><svg><use href="#i-note"/></svg><span>正在播放 · 此生不换</span><div class="mini"><i id="nowFill"></i></div><div class="wave"><i></i><i></i><i></i><i></i><i></i></div></div>
+        </div>
+      </div>
+
+      <!-- photo album grid -->
+      <div class="L" id="Lgrid">
+        <div class="hd"><b>派星天护节</b><span>相册 · 10 张</span></div>
+        <div class="tiles">
+          <div class="tile" data-i="0"><img src="../assets/run1.jpg"></div>
+          <div class="tile" data-i="1"><img src="../assets/run2.jpg"></div>
+          <div class="tile" data-i="2"><img src="../assets/party1.jpg"></div>
+          <div class="tile" data-i="3"><img src="../assets/party2.jpg"></div>
+          <div class="tile" data-i="4"><img src="../assets/show1-clean.jpg"></div>
+          <div class="tile" data-i="5"><img src="../assets/show2-clean.jpg"></div>
+          <div class="tile" data-i="6"><img src="../assets/show3-clean.jpg"></div>
+          <div class="tile" data-i="7"><img src="../assets/show4-clean.jpg"></div>
+          <div class="tile" data-i="8"><img src="../assets/frozen1.jpg"></div>
+          <div class="tile" data-i="9"><img src="../assets/frozen2.jpg"></div>
+        </div>
+      </div>
+
+      <!-- photo viewer -->
+      <div class="L" id="Lview">
+        <div class="strip" id="strip">
+          <div class="pg"><img src="../assets/run1.jpg"></div>
+          <div class="pg"><img src="../assets/run2.jpg"></div>
+          <div class="pg night"><img src="../assets/party1.jpg"></div>
+          <div class="pg night"><img src="../assets/party2.jpg"></div>
+          <div class="pg"><img src="../assets/show1-clean.jpg"></div>
+          <div class="pg"><img src="../assets/show2-clean.jpg"></div>
+          <div class="pg"><img src="../assets/show3-clean.jpg"></div>
+          <div class="pg"><img src="../assets/show4-clean.jpg"></div>
+          <div class="pg ice"><img src="../assets/frozen1.jpg"></div>
+          <div class="pg ice"><img src="../assets/frozen2.jpg"></div>
+        </div>
+        <div class="shade"></div>
+        <div class="top">
+          <div class="when"><b id="vWhen"></b><span><svg><use href="#i-pin"/></svg>吉安新世界广场来斯百货</span></div>
+          <div class="count"><b id="vIdx">1</b> / 10</div>
+        </div>
+        <div class="caps">
+          <div class="cap" data-c="0"><em>01 · RAINBOW RUN</em><div class="h ys">全家出马</div><div class="h2 sm rb">欢跑彩色马拉松</div></div>
+          <div class="cap" data-c="1"><em>02 · PARTY NIGHT</em><div class="h ys neon">带娃蹦迪</div><div class="h2 sm neon2">享欢乐周末亲子时光</div></div>
+          <div class="cap" data-c="2"><em>03 · SHOWTIME</em><div class="h ys">精彩演出不断</div><div class="h2 sub" id="showSub"><span>爆笑小丑表演</span><span>神奇科学魔术秀</span><span>多彩十米长画</span><span>梦幻泡泡秀</span></div></div>
+          <div class="cap" data-c="3"><em>04 · FROZEN PARTY</em><div class="h ys frost">来和冰雪女王</div><div class="h2 sm frost">同台飙戏</div></div>
+        </div>
+        <div id="heart"><svg><use href="#i-heart"/></svg></div>
+        <div class="film" id="film">
+          <i style="background-image:url(../assets/run1.jpg)"></i><i style="background-image:url(../assets/run2.jpg)"></i>
+          <i style="background-image:url(../assets/party1.jpg)"></i><i style="background-image:url(../assets/party2.jpg)"></i>
+          <i style="background-image:url(../assets/show1-clean.jpg)"></i><i style="background-image:url(../assets/show2-clean.jpg)"></i>
+          <i style="background-image:url(../assets/show3-clean.jpg)"></i><i style="background-image:url(../assets/show4-clean.jpg)"></i>
+          <i style="background-image:url(../assets/frozen1.jpg)"></i><i style="background-image:url(../assets/frozen2.jpg)"></i>
+        </div>
+      </div>
+
+      <!-- ending -->
+      <div class="L" id="Lendpill">
+        <div class="art rb-art"></div>
+        <div class="tt"><b>10.16 — 10.18</b><span>吉安新世界广场来斯百货 · 不见不散</span></div>
+      </div>
+      <div class="L" id="Lend">
+        <img class="lg" src="../assets/logo-header.png" alt="">
+        <div class="kick">派星天护节</div>
+        <div class="title ys"><span class="rbx">亲子彩虹跑</span></div>
+        <div class="eng">FAMILY RAINBOW RUN · 2026</div>
+        <div class="when"><b>10.16 — 10.18</b><i></i><span>吉安新世界广场来斯百货</span></div>
+        <div class="cta"><span>买品质奶粉就到孕婴世界连锁</span></div>
+        <div class="qr"><img src="../assets/qr.png" alt=""></div>
+      </div>
+      <div id="flyer"><img src="../assets/run1.jpg" alt=""></div>
+    </div>
+
+    <div id="cursor"><div class="ring"></div><svg viewBox="0 0 24 24"><path d="M4 2.5v17.2l4.6-4.3 3 6.6 2.9-1.3-3-6.5 6.3-.3Z" fill="#0b1430" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+  </div>
+
+  <canvas id="fxFront" width="1920" height="1080"></canvas>
+  <div class="layer" id="flash"></div>
+  <div class="layer" id="vignette"></div>
+</div></div>
+
+<script src="../vendor/gsap.min.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

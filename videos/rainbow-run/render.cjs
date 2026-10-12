@@ -8,8 +8,10 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || '/opt/node22/lib/nod
 const argv = process.argv.slice(2);
 const opt = (name, def) => { const i = argv.indexOf('--' + name); return i >= 0 ? argv[i + 1] : def; };
 const out = path.resolve(argv[0] && !argv[0].startsWith('--') ? argv[0] : 'out/rainbow-run.mp4');
+// --page v4/index.html renders another composition in this folder
 const FPS = +opt('fps', 30), SUB = +opt('sub', 4), WORKERS = +opt('workers', 4);
 const SHUTTER = 0.5; // 180° shutter
+const PAGE = path.resolve(__dirname, opt('page', 'index.html'));
 const ARGS = ['--run-all-compositor-stages-before-draw', '--disable-checker-imaging', '--disable-low-res-tiling', '--disable-partial-raster'];
 
 (async () => {
@@ -17,7 +19,7 @@ const ARGS = ['--run-all-compositor-stages-before-draw', '--disable-checker-imag
   const tmp = fs.mkdtempSync(path.join(path.dirname(out), '.seg-'));
   const browser = await chromium.launch({ args: ARGS });
   const probe = await browser.newPage();
-  await probe.goto('file://' + path.resolve(__dirname, 'index.html') + '?render=1');
+  await probe.goto('file://' + PAGE + '?render=1');
   await probe.waitForFunction(() => window.__ready === true, null, { timeout: 30000 });
   const dur = await probe.evaluate(() => window.DURATION);
   const FAST = await probe.evaluate(() => window.FAST || []);
@@ -34,7 +36,7 @@ const ARGS = ['--run-all-compositor-stages-before-draw', '--disable-checker-imag
     if (a >= b) return null;
     const seg = path.join(tmp, `seg${w}.mp4`);
     const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
-    await page.goto('file://' + path.resolve(__dirname, 'index.html') + '?render=1');
+    await page.goto('file://' + PAGE + '?render=1');
     await page.waitForFunction(() => window.__ready === true, null, { timeout: 30000 });
     // pre-roll so every tween initialises in timeline order
     await page.evaluate(t1 => { for (let t = 0; t < t1; t += 0.25) window.renderAt(t); }, a / FPS);
