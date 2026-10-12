@@ -20,7 +20,7 @@
 ## 文件
 
 - `index.html` / `style.css` / `main.js` — 画面与时间线（GSAP），浏览器直接打开即可预览：空格暂停，←/→ 跳 2 秒，`?t=12` 定格到某秒。
-- `assets/` — 从海报裁出的照片、商品图、抠图奖品，以及生成的云朵/光线贴图。
+- `assets/` — 从海报裁出的活动照片、Logo、二维码，以及生成的云朵/彩虹/光线贴图。
 - `src/` — 原始海报。
 - `render.cjs` — 渲染 MP4：`node render.cjs out/rainbow-run-promo.mp4`（快速运镜处做 4 次子帧采样的动态模糊）。
 - `stills.cjs` — 抽帧检查：`node stills.cjs <目录> 3 12.5 40`。
