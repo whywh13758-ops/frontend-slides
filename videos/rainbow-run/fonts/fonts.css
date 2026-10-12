@@ -1,4 +1,10 @@
+@font-face{font-family:'NS';font-style:normal;font-weight:300;font-display:block;src:url('NS-300.woff2') format('woff2');}
 @font-face{font-family:'NS';font-style:normal;font-weight:500;font-display:block;src:url('NS-500.woff2') format('woff2');}
 @font-face{font-family:'NS';font-style:normal;font-weight:700;font-display:block;src:url('NS-700.woff2') format('woff2');}
 @font-face{font-family:'NS';font-style:normal;font-weight:900;font-display:block;src:url('NS-900.woff2') format('woff2');}
-@font-face{font-family:'QK';font-style:normal;font-weight:400;font-display:block;src:url('QK-400.woff2') format('woff2');}
+@font-face{font-family:'MS';font-style:italic;font-weight:600;font-display:block;src:url('MS-600i.woff2') format('woff2');}
+@font-face{font-family:'MS';font-style:normal;font-weight:600;font-display:block;src:url('MS-600.woff2') format('woff2');}
+@font-face{font-family:'MS';font-style:italic;font-weight:700;font-display:block;src:url('MS-700i.woff2') format('woff2');}
+@font-face{font-family:'MS';font-style:normal;font-weight:700;font-display:block;src:url('MS-700.woff2') format('woff2');}
+@font-face{font-family:'MS';font-style:italic;font-weight:800;font-display:block;src:url('MS-800i.woff2') format('woff2');}
+@font-face{font-family:'MS';font-style:normal;font-weight:800;font-display:block;src:url('MS-800.woff2') format('woff2');}
