@@ -5,7 +5,7 @@
  */
 (() => {
   'use strict';
-  const W = 1920, H = 1080, DURATION = 47;
+  const W = 1920, H = 1080, MORE = 2.45, DURATION = 47 + MORE;  // MORE: the “不止明星” beat inserted after the star
   const params = new URLSearchParams(location.search);
   const RENDER = params.has('render');
   if (RENDER) document.body.classList.add('render');
@@ -62,7 +62,8 @@
     playerV: { width: 1180, height: 540, borderRadius: 48, backgroundColor: NAVY, y: 40 },
     star: { width: 1560, height: 820, borderRadius: 48, backgroundColor: NAVY, y: 0 },
     grid: { width: 1560, height: 860, borderRadius: 48, backgroundColor: '#ffffff', y: 0 },
-    view: { width: 1600, height: 880, borderRadius: 44, backgroundColor: '#000000', y: 0 },
+    more: { width: 1240, height: 300, borderRadius: 150, backgroundColor: NAVY, y: 0 },
+    view: { width: 1500, height: 840, borderRadius: 44, backgroundColor: '#0b0f1e', y: 0 },
     endpill: { width: 980, height: 130, borderRadius: 65, backgroundColor: NAVY, y: 0 },
     end: { width: 1400, height: 820, borderRadius: 52, backgroundColor: '#ffffff', y: 0 },
   };
@@ -96,6 +97,9 @@
     scrambles.push({ el, t0: t, dur });
   };
   const chars = sel => $$(sel).flatMap(el => $$('.ch', el));
+  // sound design cues, synthesised offline by audio/make_audio.py
+  const sfx = [];
+  const S = (t, type, o = {}) => sfx.push({ t, type, ...o });
 
   /* ======================================================================
      TIMELINE
@@ -105,61 +109,64 @@
   /* ---- 1 · 搜索：吉安… → 听说 吉安周末有大事发生？ (0 – 6.3) ---- */
   tl.fromTo(island, { opacity: 0, scale: 0.86, filter: 'blur(18px)' }, { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.8, ease: 'expo.out', immediateRender: true }, 0.05);
   show('#Lsearch', 0.15, 0.7);
+  S(0.05, 'appear');
   focus(0, 0.01, 960, 400, 1.42);
   focus(0.3, 1.0, 960, 410, 1.3, 'sine.inOut');
   focus(1.3, 0.8, 960, 600, 1.0, 'power3.inOut');
   focus(3.75, 0.6, 960, 420, 1.3, 'power3.inOut');
   cur(0.3, 0.65, 1110, 420);
-  click(0.98);
+  click(0.98); S(0.98, 'click');
+  [1.08, 1.22, 2.2, 2.34].forEach(k => S(k, 'key'));
   tl.to(island, { boxShadow: '0 40px 90px rgba(12,40,110,.22), 0 0 0 6px rgba(47,125,255,.25)', duration: 0.3 }, 1.0);
-  morph(1.35, 'sug', 0.6, 3);
+  morph(1.35, 'sug', 0.6, 3); S(1.35, 'whoosh', { dur: 0.6, dir: 1, g: 0.5 });
   show('#Lsug', 1.45, 0.5);
   tl.fromTo('#sugA .row', { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.45, ease: 'expo.out', stagger: 0.06, immediateRender: true }, 1.5);
-  tl.to('#sugA', { autoAlpha: 0, filter: 'blur(10px)', duration: 0.25 }, 2.4);
+  tl.to('#sugA', { autoAlpha: 0, filter: 'blur(10px)', duration: 0.25 }, 2.4); S(2.45, 'tick', { g: 0.5 });
   tl.fromTo('#sugB .row', { opacity: 0, y: 22, filter: 'blur(8px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.5, ease: 'expo.out', stagger: 0.06, immediateRender: true }, 2.5);
   cur(2.75, 0.75, 800, 852);
   tl.fromTo('#sugHover', { opacity: 0, y: 0 }, { opacity: 1, y: 104, duration: 0.25, immediateRender: false }, 2.85);
   tl.to('#sugHover', { y: 312, duration: 0.5, ease: 'power3.inOut' }, 3.0);
-  click(3.55);
+  [2.9, 3.12, 3.34].forEach(k => S(k, 'tick', { g: 0.35 }));
+  click(3.55); S(3.55, 'click'); S(3.62, 'type');
   press('#sugB .row.hot', 3.55);
   hide('#Lsug', 3.75, 0.3);
-  morph(3.75, 'bar', 0.5, 3);
+  morph(3.75, 'bar', 0.5, 3); S(3.75, 'whoosh', { dur: 0.5, dir: -1, g: 0.45 });
   tl.to(island, { boxShadow: '0 40px 90px rgba(12,40,110,.22), 0 0 0 0px rgba(47,125,255,0)', duration: 0.3 }, 3.9);
   cur(3.9, 0.8, 1380, 760);
   hide('#Lsearch', 4.35, 0.25);
-  morph(4.35, 'circle', 0.55, 8);
+  morph(4.35, 'circle', 0.55, 8); S(4.35, 'whoosh', { dur: 0.55, dir: -1, g: 0.7 }); S(4.75, 'spin', { dur: 0.55 });
   focus(4.35, 0.6, 960, 540, 1.65, 'power3.inOut');
   show('#Lspin', 4.75, 0.3);
   hide('#Lspin', 5.3, 0.15);
   show('#Lcheck', 5.32, 0.2);
-  tl.to(checkPath, { strokeDashoffset: 0, duration: 0.35, ease: 'power2.out' }, 5.35);
+  tl.to(checkPath, { strokeDashoffset: 0, duration: 0.35, ease: 'power2.out' }, 5.35); S(5.35, 'ding');
   hide('#Lcheck', 5.85, 0.2);
 
   /* ---- 2 · 青鸟飞鱼来了！ → 播放《此生不换》 → 音量拉满 (5.9 – 10.9) ---- */
-  morph(5.9, 'pill', 0.6, 6);
+  morph(5.9, 'pill', 0.6, 6); S(5.9, 'whoosh', { dur: 0.6, dir: 1, g: 0.7 }); S(6.15, 'chime');
   focus(5.9, 0.7, 960, 540, 1.4, 'power3.inOut');
   show('#Lpill', 6.15, 0.6);
   tl.fromTo('#Lpill .art', { scale: 0.3 }, { scale: 1, duration: 0.7, ease: 'back.out(2)', immediateRender: true }, 6.15);
   hide('#Lpill', 7.25, 0.3);
-  morph(7.25, 'player', 0.65, 6);
+  morph(7.25, 'player', 0.65, 6); S(7.25, 'whoosh', { dur: 0.65, dir: 1, g: 0.8 });
   show('#Lplayer', 7.5, 0.6);
   focus(7.25, 0.7, 960, 520, 1.06, 'power3.inOut');
   cur(7.8, 0.6, 1146, 660);
-  click(8.45);
+  click(8.45); S(8.45, 'click', { g: 1.2 });
   press('#Lplayer .pp', 8.45);
   tl.set('#Lplayer .play', { autoAlpha: 1 }, 0);
   tl.set('#Lplayer .pause', { autoAlpha: 0 }, 0);
   tl.to('#Lplayer .play', { autoAlpha: 0, scale: 0.4, duration: 0.18 }, 8.5);
   tl.fromTo('#Lplayer .pause', { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.3, ease: 'back.out(2.5)', immediateRender: false }, 8.55);
-  morph(8.95, 'playerV', 0.5, 2);
+  morph(8.95, 'playerV', 0.5, 2); S(8.95, 'whoosh', { dur: 0.5, dir: 1, g: 0.35 });
   focus(8.95, 0.7, 960, 600, 1.06);
   cur(9.1, 0.5, 692, 788);
-  click(9.62);
+  click(9.62); S(9.62, 'click'); S(9.7, 'riser', { dur: 1.02 });
   tl.to(fx, { vol: 100, duration: 1.0, ease: 'power2.inOut' }, 9.7);
   tl.to('#cursor', { x: 1383, duration: 1.0, ease: 'power2.inOut' }, 9.7);
   // BOOM — the whole thing comes alive
   flash(10.72, 0.55, 4);
-  burst(10.72, 960, 560, 220, 3);
+  burst(10.72, 960, 560, 220, 3); S(10.72, 'boom');
   tl.fromTo(fx, { burst: 0 }, { burst: 1, duration: 0.25, ease: 'power2.out', immediateRender: false }, 10.7);
   tl.to(fx, { burst: 0.55, duration: 1.2, ease: 'power2.inOut' }, 11.0);
   tl.to(fx, { eq: 1, duration: 0.6 }, 10.7);
@@ -169,20 +176,25 @@
 
   /* ---- 3 · 明星嘉宾 青鸟飞鱼-虎虎 (10.9 – 17.6) ---- */
   hide('#Lplayer', 10.9, 0.3);
-  morph(10.95, 'star', 0.7, 8);
+  morph(10.95, 'star', 0.7, 8); S(10.95, 'whoosh', { dur: 0.7, dir: 1, g: 0.6 });
   show('#Lstar', 11.25, 0.7);
   tl.fromTo('#Lstar .photo', { scale: 1.15, x: -40 }, { scale: 1, x: 0, duration: 1.4, ease: 'expo.out', immediateRender: true }, 11.25);
   scramble('#Lstar .lab .scr', 11.45, 0.8);
   tl.fromTo(chars('#Lstar .n1'), { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: 0.08, immediateRender: true }, 11.6);
+  [0, 1, 2, 3].forEach(i => S(11.6 + i * 0.08, 'key', { g: 0.6 }));
+  S(11.97, 'thump'); S(12.09, 'thump', { g: 0.8 });
   tl.fromTo(chars('#Lstar .n2'), { scale: 2.6, opacity: 0, y: -40 }, { scale: 1, opacity: 1, y: 0, duration: 0.6, ease: 'expo.out', stagger: 0.12, immediateRender: true }, 11.95);
-  tl.fromTo('#Lstar .chip', { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: 'back.out(2)', immediateRender: true }, 12.35);
+  tl.fromTo('#Lstar .date', { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: 'back.out(2)', immediateRender: true }, 12.35); S(12.35, 'pop', { g: 0.9 });
+  [12.6, 13.05, 13.5].forEach(k => S(k, 'tick', { g: 0.5 }));
   tl.fromTo('#Lstar .row', { opacity: 0, x: 40, filter: 'blur(8px)' }, { opacity: 1, x: 0, filter: 'blur(0px)', duration: 0.6, ease: 'expo.out', stagger: 0.45, immediateRender: true }, 12.6);
   tl.fromTo('#Lstar .now', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out', immediateRender: true }, 13.8);
-  focus(12.9, 1.6, 1180, 680, 1.28);
-  cur(12.4, 0.8, 1020, 606);
+  const rowsEl = $('#Lstar .rows'), colEl = $('#Lstar .col');
+  const rowY = i => 540 - 410 + colEl.offsetTop + rowsEl.offsetTop + i * 86 + 43;
+  focus(12.9, 1.6, 1180, rowY(1) - 10, 1.28);
+  cur(12.4, 0.8, 1020, rowY(0) + 4);
   tl.fromTo('#starHover', { opacity: 0, y: 0 }, { opacity: 1, y: 0, duration: 0.3, immediateRender: false }, 13.2);
-  cur(13.9, 0.5, 1040, 692); tl.to('#starHover', { y: 86, duration: 0.45, ease: 'power3.inOut' }, 13.9);
-  cur(14.7, 0.5, 1060, 778); tl.to('#starHover', { y: 172, duration: 0.45, ease: 'power3.inOut' }, 14.7);
+  cur(13.9, 0.5, 1040, rowY(1) + 4); tl.to('#starHover', { y: 86, duration: 0.45, ease: 'power3.inOut' }, 13.9); S(13.95, 'tick', { g: 0.4 });
+  cur(14.7, 0.5, 1060, rowY(2) + 4); tl.to('#starHover', { y: 172, duration: 0.45, ease: 'power3.inOut' }, 14.7); S(14.75, 'tick', { g: 0.4 });
   focus(15.6, 1.3, 960, 540, 1.0);
   tl.to('#starHover', { opacity: 0, duration: 0.3 }, 15.8);
   cur(15.8, 0.9, 1460, 960);
@@ -191,15 +203,16 @@
   tl.to(fx, { eq: 0, duration: 0.6 }, 17.4);
   tl.to(fx, { burst: 0, duration: 0.8 }, 17.4);
   hide('#Lstar', 17.6, 0.3);
-  morph(17.65, 'grid', 0.7, 8);
+  morph(17.65, 'grid', 0.7, 8); S(17.65, 'whoosh', { dur: 0.7, dir: 1, g: 0.6 });
+  for (let i = 0; i < 10; i++) S(18.0 + i * 0.045, 'pop', { g: 0.35, p: 1 + i * 0.05 });
   show('#Lgrid', 17.95, 0.5);
   tl.fromTo('#Lgrid .tile', { scale: 0.6, opacity: 0, y: 40 }, { scale: 1, opacity: 1, y: 0, duration: 0.6, ease: 'expo.out', stagger: { each: 0.045, from: 'start' }, immediateRender: true }, 18.0);
   cur(18.7, 0.65, 378, 424);
-  click(19.42);
+  click(19.42); S(19.42, 'click');
   press('#Lgrid .tile[data-i="0"]', 19.42);
   // shared-element: the tapped tile grows into the full-screen viewer
   tl.set('#flyer', { autoAlpha: 1, left: 60, top: 160, width: 275, height: 302, borderRadius: 20 }, 19.55);
-  tl.to('#flyer', { left: 0, top: 0, width: 1600, height: 880, borderRadius: 0, duration: 0.75, ease: E }, 19.55);
+  tl.to('#flyer', { left: 268, top: 92, width: 963, height: 470, borderRadius: 22, duration: 0.75, ease: E }, 19.55); S(19.55, 'whoosh', { dur: 0.75, dir: 1, g: 0.7 });
   morph(19.55, 'view', 0.75, 0);
   hide('#Lgrid', 19.6, 0.4);
   tl.set('#Lview', { autoAlpha: 1, filter: 'blur(0px)', scale: 1 }, 20.28);
@@ -211,14 +224,14 @@
   const SW = [[22.2, 1], [23.9, 2], [26.0, 3], [27.5, 4], [28.8, 5], [30.0, 6], [31.2, 7], [32.7, 8], [34.5, 9]];
   SW.forEach(([t, p]) => {
     cur(t - 0.45, 0.35, 1420, 600, 'power2.out');
-    click(t - 0.08);
+    click(t - 0.08); S(t - 0.08, 'click', { g: 0.45 }); S(t, 'swipe');
     tl.to('#cursor', { x: 640, duration: 0.5, ease: 'power3.inOut' }, t);
-    tl.to('#strip', { x: -1600 * p, duration: 0.72, ease: 'expo.inOut' }, t);
+    tl.to('#strip', { x: -1500 * p, duration: 0.72, ease: 'expo.inOut' }, t);
     tl.to(cam, { ry: -2.4, duration: 0.36, ease: 'power2.out' }, t);
     tl.to(cam, { ry: 0, duration: 0.6, ease: 'power2.inOut' }, t + 0.36);
-    tl.fromTo(`#strip .pg:nth-child(${p + 1}) img`, { scale: 1.16 }, { scale: 1.0, duration: 3.2, ease: 'power2.out', immediateRender: false }, t);
+    tl.fromTo(`#strip .pg:nth-child(${p + 1}) .fg img`, { scale: 1.12 }, { scale: 1.0, duration: 3.2, ease: 'power2.out', immediateRender: false }, t);
   });
-  tl.fromTo('#strip .pg:nth-child(1) img', { scale: 1.16 }, { scale: 1.0, duration: 3.6, ease: 'power2.out', immediateRender: true }, 19.6);
+  tl.fromTo('#strip .pg:nth-child(1) .fg img', { scale: 1.12 }, { scale: 1.0, duration: 3.6, ease: 'power2.out', immediateRender: true }, 19.6);
   // captions per event group
   const capIn = (c, t) => {
     tl.set(`#Lview .cap[data-c="${c}"]`, { autoAlpha: 1 }, t);
@@ -238,7 +251,7 @@
   // double-tap hearts
   [[25.15, 1180, 520], [35.4, 1000, 470]].forEach(([t, x, y]) => {
     cur(t - 0.55, 0.45, x, y, 'power2.inOut');
-    click(t - 0.12); click(t + 0.05);
+    click(t - 0.12); click(t + 0.05); S(t - 0.12, 'click', { g: 0.45 }); S(t + 0.05, 'click', { g: 0.45 }); S(t + 0.1, 'heart');
     tl.fromTo('#heart', { scale: 0, opacity: 1, rotation: -12 }, { scale: 1, opacity: 1, rotation: 0, duration: 0.45, ease: 'back.out(2.6)', immediateRender: false }, t + 0.08);
     tl.to('#heart', { scale: 1.2, opacity: 0, y: -60, duration: 0.45, ease: 'power2.in' }, t + 0.75);
     tl.set('#heart', { y: 0 }, t + 1.3);
@@ -247,12 +260,12 @@
 
   /* ---- 5 · 落版 (37.4 – 47) ---- */
   hide('#Lview', 37.4, 0.35);
-  morph(37.45, 'endpill', 0.75, 10);
+  morph(37.45, 'endpill', 0.75, 10); S(37.42, 'whoosh', { dur: 0.75, dir: -1, g: 0.9 });
   focus(37.45, 0.75, 960, 540, 1.0);
-  show('#Lendpill', 37.95, 0.6);
+  show('#Lendpill', 37.95, 0.6); S(37.95, 'chime', { g: 0.8 });
   tl.fromTo('#Lendpill .art', { scale: 0.3, rotation: -90 }, { scale: 1, rotation: 0, duration: 0.8, ease: 'back.out(2)', immediateRender: true }, 37.95);
   hide('#Lendpill', 39.05, 0.3);
-  morph(39.05, 'end', 0.7, 8);
+  morph(39.05, 'end', 0.7, 8); S(39.05, 'whoosh', { dur: 0.7, dir: 1, g: 0.9 }); S(39.6, 'thump', { g: 0.7 });
   show('#Lend', 39.35, 0.7);
   tl.fromTo('#Lend .kick', { letterSpacing: '70px', opacity: 0 }, { letterSpacing: '22px', opacity: 1, duration: 1.6, ease: 'expo.out', immediateRender: true }, 39.4);
   tl.fromTo('#Lend .title', { y: 60, opacity: 0, filter: 'blur(14px)' }, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.0, ease: 'expo.out', immediateRender: true }, 39.55);
@@ -260,17 +273,38 @@
   tl.fromTo('#Lend .qr', { scale: 0.7, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.7, ease: 'back.out(2)', immediateRender: true }, 40.4);
   scramble('#Lend .eng', 39.9, 0.9);
   cur(40.6, 0.9, 1080, 832);
-  click(41.7);
+  click(41.7); S(41.7, 'click', { g: 1.1 }); S(41.76, 'success');
   press('#Lend .cta', 41.7);
   flash(41.75, 0.25, 6);
   burst(41.8, 960, 690, 160, 9);
   cur(42.4, 1.4, 1700, 1040);
   focus(39.05, 7.9, 960, 540, 1.04, 'sine.inOut');
 
+  /* ---- 3.5 · 周末不止明星，还有更多精彩 (17.6 – 20.05) ----
+     Everything authored from the album on is pushed back by MORE seconds. */
+  tl.shiftChildren(MORE, false, 17.62);
+  const shiftEv = list => list.forEach(e => { if (Array.isArray(e)) { if (e[0] >= 17.62) e[0] += MORE; } else if (e.t >= 17.62) e.t += MORE; });
+  [flashes, bursts, sfx].forEach(shiftEv);
+  morph(17.62, 'more', 0.6, 8); S(17.62, 'whoosh', { dur: 0.6, dir: -1, g: 0.7 });
+  focus(17.62, 0.7, 960, 540, 1.22, 'power3.inOut');
+  show('#Lmore', 17.85, 0.4);
+  tl.fromTo(chars('#Lmore .m1'), { scale: 2.4, opacity: 0, y: -30 }, { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: 'expo.out', stagger: 0.07, immediateRender: true }, 17.9);
+  for (let i = 0; i < 6; i++) S(17.92 + i * 0.07, 'thump', { g: 0.45, p: 1 + i * 0.04 });
+  tl.to('#Lmore .m1', { opacity: 0, y: -60, filter: 'blur(12px)', duration: 0.35, ease: 'power2.in' }, 18.95);
+  tl.fromTo('#Lmore .m2', { opacity: 0, y: 70, filter: 'blur(14px)', scale: 0.9 }, { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1, duration: 0.7, ease: 'expo.out', immediateRender: true }, 19.1);
+  S(18.98, 'whoosh', { dur: 0.4, dir: 1, g: 0.4 }); S(19.12, 'sparkle');
+  tl.fromTo('#Lmore .m3', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out', immediateRender: true }, 19.3);
+  burst(19.15, 960, 520, 120, 13);
+  hide('#Lmore', 20.0, 0.25);
+  focus(20.0, 0.7, 960, 540, 1.0, 'power3.inOut');
+
   tl.set({}, {}, DURATION);
+  window.SFX = sfx;
+  window.MUSIC = { play: 8.5, vol: [9.7, 10.7, 20, 100], drop: 10.72, bpm: 120, starEnd: 17.6, album: 17.62 + MORE, endPill: 37.4 + MORE, cta: 41.7 + MORE, end: DURATION,
+    party: [23.9 + MORE, 27.5 + MORE], frozen: [32.7 + MORE, 37.4 + MORE] };
   // fast segments get sub-frame motion blur in render.cjs
-  window.FAST = [[0.9, 1.1], [1.3, 2.0], [3.5, 4.2], [4.3, 5.0], [5.85, 6.6], [7.2, 8.0], [8.9, 9.5], [9.7, 11.7], [17.6, 18.5],
-    [19.5, 20.4], ...SW.map(([t]) => [t - 0.1, t + 0.8]), [37.4, 38.3], [39.0, 39.9]];
+  window.FAST = [[0.9, 1.1], [1.3, 2.0], [3.5, 4.2], [4.3, 5.0], [5.85, 6.6], [7.2, 8.0], [8.9, 9.5], [9.7, 11.7], [17.6, 18.5], [18.9, 19.4],
+    ...[[17.6, 18.5], [19.5, 20.4], ...SW.map(([t]) => [t - 0.1, t + 0.8]), [37.4, 38.3], [39.0, 39.9]].map(([a, b]) => [a + MORE, b + MORE])];
 
   /* ======================================================================
      PARTICLES
@@ -360,7 +394,7 @@
     rbx.forEach(e => { e.style.backgroundPosition = `${(t * 26) % 200}% 0`; });
 
     // photo viewer chrome follows the strip
-    const sx = -gsap.getProperty(strip, 'x') / 1600;
+    const sx = -gsap.getProperty(strip, 'x') / 1500;
     const idx = clamp(Math.round(sx), 0, 9);
     if (vWhen.textContent !== WHEN[idx]) vWhen.textContent = WHEN[idx];
     vIdx.textContent = idx + 1;
@@ -384,12 +418,12 @@
       }
     }
     cf.globalCompositeOperation = 'source-over';
-    const sn = env(t, 32.8, 37.5, 0.5, 0.4);
+    const sn = env(t, 32.8 + MORE, 37.5 + MORE, 0.5, 0.4);
     if (sn > 0) for (const p of snow) {
       const y = ((p.y + p.v * t) % (H + 100)) - 50, x = p.x + Math.sin(t * 0.9 + p.ph) * p.sw, sz = p.r * 2.2;
       cf.globalAlpha = sn * (0.4 + 0.6 * p.d); cf.drawImage(glow[1], x - sz, y - sz, sz * 2, sz * 2);
     }
-    const sp = Math.max(env(t, 10.8, 17.4, 0.4, 0.6) * 0.8, env(t, 39.6, 47.5, 0.6, 0.4) * 0.7);
+    const sp = Math.max(env(t, 10.8, 17.4, 0.4, 0.6) * 0.8, env(t, 18.9, 20.0, 0.3, 0.4) * 0.8, env(t, 39.6 + MORE, 50, 0.6, 0.4) * 0.7);
     if (sp > 0) { cf.fillStyle = '#fff'; for (const p of sparks) { const k = Math.max(0, Math.sin(t * p.sp + p.ph)); cf.globalAlpha = sp * k; cf.drawImage(glow[0], p.x - p.s, p.y - p.s, p.s * 2, p.s * 2); } }
     cf.globalAlpha = 1;
   }

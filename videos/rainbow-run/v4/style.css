@@ -112,7 +112,9 @@ svg { display: block; }
 #Lstar .nm { display: flex; align-items: flex-end; gap: 26px; margin-top: 30px; white-space: nowrap; }
 #Lstar .n1 { font-family: 'Smiley Sans Oblique', sans-serif; font-size: 104px; line-height: 1; color: transparent; -webkit-text-stroke: 2.5px #fff; padding-bottom: 18px; }
 #Lstar .n2 { font-family: 'YouSheBiaoTiHei', sans-serif; font-size: 220px; line-height: .9; }
-#Lstar .chip { display: inline-block; margin-top: 18px; font-size: 30px; font-weight: 500; letter-spacing: 6px; padding: 10px 26px; border-radius: 30px; background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.35); }
+#Lstar .date { display: inline-flex; align-items: baseline; gap: 18px; margin-top: 22px; padding: 12px 34px 14px; border-radius: 40px; border: 2px solid var(--gold-2); background: rgba(255,211,107,.1); }
+#Lstar .date b { font-size: 50px; font-weight: 900; color: var(--gold-2); letter-spacing: 2px; }
+#Lstar .date span { font-size: 34px; font-weight: 700; letter-spacing: 4px; }
 #Lstar .rows { position: relative; margin-top: 30px; }
 #Lstar .rows .hover { position: absolute; left: -20px; right: 0; top: 0; height: 86px; border-radius: 20px; background: rgba(255,255,255,.09); opacity: 0; }
 #Lstar .row { position: relative; height: 86px; display: flex; align-items: center; gap: 22px; font-size: 34px; font-weight: 500; white-space: nowrap; }
@@ -123,6 +125,14 @@ svg { display: block; }
 #Lstar .now .mini { position: relative; width: 300px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.16); margin-left: 10px; }
 #Lstar .now .mini i { position: absolute; left: 0; top: 0; bottom: 0; width: 20%; border-radius: 3px; background: #fff; }
 #Lstar .now .wave { right: 30px; height: 36px; margin-top: -18px; }
+
+/* 周末不止明星 */
+#Lmore { width: 1240px; height: 300px; color: #fff; text-align: center; }
+#Lmore .m1, #Lmore .m2 { position: absolute; left: 0; right: 0; top: 42px; font-size: 136px; line-height: 1; white-space: nowrap; }
+#Lmore .m2 .rbx { filter: drop-shadow(0 10px 26px rgba(0,0,0,.35)); }
+#Lmore .m3 { position: absolute; left: 0; right: 0; top: 214px; display: flex; justify-content: center; align-items: center; gap: 18px; font-size: 28px; color: var(--mute); font-weight: 500; letter-spacing: 2px; }
+#Lmore .m3 b { font-family: 'MS', sans-serif; font-weight: 800; color: #fff; letter-spacing: 1px; }
+#Lmore .m3 i { width: 8px; height: 8px; border-radius: 50%; background: var(--gold-2); }
 
 /* album grid */
 #Lgrid { width: 1560px; height: 860px; }
@@ -135,29 +145,32 @@ svg { display: block; }
 #flyer { position: absolute; left: 0; top: 0; overflow: hidden; visibility: hidden; z-index: 5; }
 #flyer img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-/* photo viewer */
-#Lview { width: 1600px; height: 880px; color: #fff; }
-#Lview .strip { position: absolute; left: 0; top: 0; height: 880px; display: flex; }
-#Lview .pg { position: relative; width: 1600px; height: 880px; overflow: hidden; flex: none; }
-#Lview .pg img { width: 100%; height: 100%; object-fit: cover; display: block; }
-#Lview .pg.night::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 15% 20%, rgba(255,60,200,.35), transparent 45%), radial-gradient(circle at 85% 80%, rgba(60,180,255,.35), transparent 45%); mix-blend-mode: screen; }
-#Lview .pg.ice::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(230,245,255,.55) 100%); }
-#Lview .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.5) 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0) 45%, rgba(0,8,30,.78) 100%); }
-#Lview .top { position: absolute; left: 56px; right: 56px; top: 40px; display: flex; justify-content: space-between; align-items: flex-start; }
-#Lview .when b { display: block; font-size: 38px; font-weight: 700; letter-spacing: 1px; }
-#Lview .when span { display: flex; align-items: center; gap: 10px; font-size: 24px; color: rgba(255,255,255,.85); margin-top: 6px; }
-#Lview .when svg { width: 24px; height: 24px; }
-#Lview .count { font-family: 'MS', sans-serif; font-weight: 600; font-size: 28px; color: rgba(255,255,255,.85); padding: 8px 22px; border-radius: 26px; background: rgba(0,0,0,.28); }
+/* photo viewer: photo shown at a size the source can hold, over a blurred wash of itself */
+#Lview { width: 1500px; height: 840px; color: #fff; }
+#Lview .strip { position: absolute; left: 0; top: 0; height: 840px; display: flex; }
+#Lview .pg { position: relative; width: 1500px; height: 840px; overflow: hidden; flex: none; background: #0b0f1e; }
+#Lview .bgi { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.08); }
+#Lview .fg { position: absolute; top: 92px; border-radius: 22px; overflow: hidden; box-shadow: 0 34px 70px rgba(0,0,0,.45), 0 0 0 1.5px rgba(255,255,255,.25); }
+#Lview .fg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#Lview .pg.night .bgi { filter: hue-rotate(-20deg) saturate(1.3); }
+#Lview .pg.night .fg { box-shadow: 0 0 0 2px rgba(255,120,220,.55), 0 0 60px rgba(255,80,210,.45), 0 34px 70px rgba(0,0,0,.5); }
+#Lview .pg.ice .fg { box-shadow: 0 0 50px rgba(255,255,255,.55), 0 34px 70px rgba(0,0,0,.35); }
+#Lview .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 14%, rgba(0,0,0,0) 58%, rgba(0,8,30,.55) 100%); }
+#Lview .top { position: absolute; left: 56px; right: 56px; top: 30px; display: flex; justify-content: space-between; align-items: flex-start; }
+#Lview .when b { display: block; font-size: 30px; font-weight: 700; letter-spacing: 1px; }
+#Lview .when span { display: flex; align-items: center; gap: 8px; font-size: 20px; color: rgba(255,255,255,.85); margin-top: 4px; }
+#Lview .when svg { width: 20px; height: 20px; }
+#Lview .count { font-family: 'MS', sans-serif; font-weight: 600; font-size: 24px; color: rgba(255,255,255,.85); padding: 6px 20px; border-radius: 24px; background: rgba(0,0,0,.28); }
 #Lview .count b { color: #fff; font-weight: 800; }
-#Lview .caps { position: absolute; left: 70px; bottom: 150px; }
+#Lview .caps { position: absolute; left: 72px; bottom: 58px; }
 #Lview .cap { position: absolute; left: 0; bottom: 0; white-space: nowrap; visibility: hidden; }
-#Lview .cap em { display: block; font-style: normal; font-family: 'MS', sans-serif; font-weight: 600; font-size: 24px; letter-spacing: 8px; color: rgba(255,255,255,.88); margin-bottom: 14px; }
-#Lview .cap .h { font-size: 128px; line-height: 1; filter: drop-shadow(0 10px 30px rgba(0,0,0,.35)); }
-#Lview .cap .h2 { font-size: 74px; line-height: 1.1; margin-top: 10px; }
-#Lview .cap .sub { position: relative; height: 84px; font-family: 'Smiley Sans Oblique', sans-serif; font-size: 70px; }
+#Lview .cap em { display: block; font-style: normal; font-family: 'MS', sans-serif; font-weight: 600; font-size: 22px; letter-spacing: 8px; color: rgba(255,255,255,.88); margin-bottom: 10px; }
+#Lview .cap .h { font-size: 104px; line-height: 1; filter: drop-shadow(0 10px 30px rgba(0,0,0,.35)); }
+#Lview .cap .h2 { font-size: 60px; line-height: 1.1; margin-top: 8px; }
+#Lview .cap .sub { position: relative; height: 70px; font-family: 'Smiley Sans Oblique', sans-serif; font-size: 58px; }
 #Lview .cap .sub span { position: absolute; left: 0; top: 0; opacity: 0; white-space: nowrap; }
-#Lview .film { position: absolute; left: 50%; bottom: 44px; display: flex; gap: 10px; transform: translateX(-50%); }
-#Lview .film i { display: block; width: 70px; height: 48px; border-radius: 9px; background-size: cover; background-position: center; opacity: .45; box-shadow: 0 0 0 2px rgba(255,255,255,0); }
+#Lview .film { position: absolute; right: 60px; bottom: 66px; display: flex; gap: 8px; }
+#Lview .film i { display: block; width: 54px; height: 38px; border-radius: 8px; background-size: cover; background-position: center; opacity: .45; }
 #heart { position: absolute; left: 50%; top: 46%; width: 220px; height: 220px; margin: -110px 0 0 -110px; color: #ff4d7d; opacity: 0; filter: drop-shadow(0 10px 30px rgba(255,60,120,.5)); }
 #heart svg { width: 100%; height: 100%; }
 
@@ -168,15 +181,18 @@ svg { display: block; }
 #Lendpill .tt b { display: block; font-family: 'MS', sans-serif; font-weight: 800; font-size: 44px; letter-spacing: 2px; }
 #Lendpill .tt span { display: block; font-size: 26px; color: var(--mute); margin-top: 4px; font-weight: 500; }
 #Lend { width: 1400px; height: 820px; text-align: center; color: var(--ink); }
-#Lend .lg { position: absolute; left: 50%; top: 64px; height: 54px; transform: translateX(-50%); filter: brightness(0) saturate(100%) invert(8%) sepia(28%) saturate(2500%) hue-rotate(205deg); }
-#Lend .kick { position: absolute; left: 0; right: 0; top: 168px; font-size: 42px; font-weight: 500; letter-spacing: 22px; }
-#Lend .title { position: absolute; left: 0; right: 0; top: 232px; font-size: 210px; line-height: 1; }
-#Lend .eng { position: absolute; left: 0; right: 0; top: 470px; font-family: 'MS', sans-serif; font-weight: 600; font-size: 26px; letter-spacing: 16px; color: #5d6f96; }
-#Lend .when { position: absolute; left: 0; right: 0; top: 530px; display: flex; justify-content: center; align-items: center; gap: 22px; }
+#Lend .lg { position: absolute; left: 50%; top: 50px; height: 54px; transform: translateX(-50%); filter: brightness(0) saturate(100%) invert(8%) sepia(28%) saturate(2500%) hue-rotate(205deg); }
+#Lend .region { position: absolute; left: 50%; top: 122px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 8px 28px 10px 22px; border-radius: 30px; background: #eef4ff; font-size: 32px; font-weight: 700; letter-spacing: 4px; white-space: nowrap; }
+#Lend .region svg { width: 30px; height: 30px; color: #2f7dff; }
+#Lend .kick { position: absolute; left: 0; right: 0; top: 196px; font-size: 42px; font-weight: 500; letter-spacing: 22px; }
+#Lend .title { position: absolute; left: 0; right: 0; top: 252px; font-size: 200px; line-height: 1; }
+#Lend .eng { position: absolute; left: 0; right: 0; top: 480px; font-family: 'MS', sans-serif; font-weight: 600; font-size: 26px; letter-spacing: 16px; color: #5d6f96; }
+#Lend .when { position: absolute; left: 0; right: 0; top: 534px; display: flex; justify-content: center; align-items: center; gap: 22px; }
 #Lend .when b { font-family: 'MS', sans-serif; font-weight: 800; font-size: 46px; letter-spacing: 1px; }
 #Lend .when i { width: 10px; height: 10px; border-radius: 50%; background: var(--gold-3); }
-#Lend .when span { font-size: 38px; font-weight: 500; }
-#Lend .cta { position: absolute; left: 50%; top: 636px; width: 820px; height: 108px; margin-left: -410px; border-radius: 54px; background: var(--navy); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 42px; font-weight: 700; letter-spacing: 3px; box-shadow: 0 18px 40px rgba(12,22,49,.3); }
+#Lend .when span { font-size: 36px; font-weight: 500; }
+#Lend .when strong { font-weight: 900; }
+#Lend .cta { position: absolute; left: 50%; top: 638px; width: 820px; height: 108px; margin-left: -410px; border-radius: 54px; background: var(--navy); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 42px; font-weight: 700; letter-spacing: 3px; box-shadow: 0 18px 40px rgba(12,22,49,.3); }
 #Lend .qr { position: absolute; right: 56px; bottom: 56px; width: 170px; height: 196px; border-radius: 18px; background: #fff; box-shadow: 0 10px 30px rgba(12,40,110,.18); padding: 6px; }
 #Lend .qr img { width: 100%; height: 100%; object-fit: contain; }
 
