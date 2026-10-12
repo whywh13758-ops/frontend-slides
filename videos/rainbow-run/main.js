@@ -33,6 +33,7 @@
   const env = (t, t0, t1, fin = 0.4, fout = 0.5) =>
     t < t0 || t > t1 ? 0 : Math.min(clamp((t - t0) / fin), clamp((t1 - t) / fout));
 
+  const els = sel => [].concat(sel).flatMap(s => (typeof s === 'string' ? $$(s) : [s]));
   /* ---------------- masked type: wrap text so it can rise from behind a line ---------------- */
   function wrapMask(el) {
     const hl = el.classList.contains('hl'), gold = el.classList.contains('gold');
@@ -48,7 +49,34 @@
       el.innerHTML = `<span class="ln"><span class="${cls}">${el.innerHTML}</span></span>`;
     }
   }
-  $$('.kicker, .mega, .h1, .h1x, .eng, .role').forEach(wrapMask);
+  $$('.mega, .h1, .h1x, .role').forEach(wrapMask);
+  // split text into per-character spans for kinetic type
+  function splitChars(root) {
+    const walk = node => {
+      [...node.childNodes].forEach(n => {
+        if (n.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          for (const ch of n.textContent) {
+            if (ch === '\n') continue;
+            const s = document.createElement('span'); s.className = 'ch'; s.textContent = ch; frag.appendChild(s);
+          }
+          n.replaceWith(frag);
+        } else if (n.nodeType === 1 && !n.matches('.cursor, .bar, i, svg')) walk(n);
+      });
+    };
+    walk(root);
+  }
+  $$('.split').forEach(el => {
+    splitChars(el);
+    // gradient fills clip to their own box, so they must live on each character
+    ['hl', 'gold', 'hlr', 'rb'].forEach(c => {
+      if (el.classList.contains(c)) { el.classList.remove(c); $$('.ch', el).forEach(ch => ch.classList.add(c)); }
+    });
+  });
+  const chars = sel => els(sel).flatMap(el => $$('.ch', el));
+  // scrambled-text reveals (resolved per frame in render)
+  const scrambles = [];
+  $$('.scr').forEach(el => { el._txt = el.textContent; el.textContent = ''; });
 
   /* ---------------- place the world ---------------- */
   const num = (v, n) => { const a = (v || '').split(',').map(Number); while (a.length < n) a.push(0); return a; };
@@ -110,7 +138,6 @@
   })();
 
   /* ---------------- helpers for the timeline ---------------- */
-  const els = sel => [].concat(sel).flatMap(s => (typeof s === 'string' ? $$(s) : [s]));
   const EASE = 'expo.out';
   function fly(sel, from, t, dur = 1.1, ease = EASE, stagger = 0) {
     els(sel).forEach((el, i) => {
@@ -140,12 +167,33 @@
       if (img) tl.fromTo(img, { scale: 1.25 }, { scale: 1, duration: 2.2, ease: 'expo.out', immediateRender: true }, t);
     });
   }
+  // per-character effects
+  const typewriter = (sel, t, cps = 14) =>
+    tl.fromTo(chars(sel), { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: 1 / cps, ease: 'none', immediateRender: true }, t);
+  const slam = (sel, t, stagger = 0.08) =>
+    tl.fromTo(chars(sel), { scale: 2.6, opacity: 0, y: -40 }, { scale: 1, opacity: 1, y: 0, duration: 0.6, ease: 'expo.out', stagger, immediateRender: true }, t);
+  const flipIn = (sel, t, stagger = 0.06) =>
+    tl.fromTo(chars(sel), { rotationX: -100, opacity: 0, transformOrigin: '50% 100%', transformPerspective: 500 },
+      { rotationX: 0, opacity: 1, duration: 0.8, ease: 'expo.out', stagger, immediateRender: true }, t);
+  const popIn = (sel, t, stagger = 0.09) =>
+    tl.fromTo(chars(sel), { scale: 0, opacity: 0, rotation: -12 }, { scale: 1, opacity: 1, rotation: 0, duration: 0.6, ease: 'back.out(2.2)', stagger, immediateRender: true }, t);
+  const blurIn = (sel, t, stagger = 0.07) =>
+    tl.fromTo(chars(sel), { filter: 'blur(22px)', opacity: 0, scale: 1.35 }, { filter: 'blur(0px)', opacity: 1, scale: 1, duration: 1.3, ease: 'expo.out', stagger, immediateRender: true }, t);
+  const tracking = (sel, t, from = 80, to = 22) =>
+    tl.fromTo(sel, { letterSpacing: from + 'px', opacity: 0 }, { letterSpacing: to + 'px', opacity: 1, duration: 1.8, ease: 'expo.out', immediateRender: true }, t);
+  const slideSkew = (sel, t, dir = 1) =>
+    tl.fromTo(els(sel).flatMap(el => $$('.tx', el)), { x: -340 * dir, skewX: -24 * dir, opacity: 0 }, { x: 0, skewX: 0, opacity: 1, duration: 1.1, ease: 'expo.out', immediateRender: true }, t);
+  const scramble = (sel, t, dur = 0.9) => els(sel).forEach(el => scrambles.push({ el, t0: t, dur }));
+  const marker = (root, t, stagger = 0.4) =>
+    tl.fromTo($$('.mark .bar', typeof root === 'string' ? $(root) : root), { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: 'expo.inOut', stagger, immediateRender: true }, t);
+
   function header(root, t) {
     const g = typeof root === 'string' ? $(root) : root;
     const chap = $('.chap', g), tag = $('.tag', g), h1 = $('.h1', g);
     fly(chap, { x: -40 }, t, 1.0);
     tl.fromTo($('i', chap), { scaleX: 0 }, { scaleX: 1, duration: 1.0, ease: 'expo.inOut', immediateRender: true }, t + 0.1);
     fly(tag, { y: 30 }, t + 0.18, 1.0);
+    scramble($('.scr', chap), t + 0.15, 0.8);
     if (!h1) return;
     tl.set(h1, { autoAlpha: 1 }, t);
     rise(h1, t + 0.32, 0, 1.1);
@@ -177,12 +225,13 @@
   mv(2.2, 3.4, { z: 1200, x: 30, yaw: -2 }, 'sine.inOut');
   fly('#rainbow', { z: -900 }, 0.6, 2.4, 'power2.out');
   fxTo(0.7, 2.0, { rv: 125 }, 'power2.inOut');
-  rise('#aKick', 1.55, 0, 1.1);
+  tracking('#aKick', 1.5, 90, 22);
+  fly('#aBg', { x: 500 }, 1.2, 6.0, 'power1.out');
   rise('.t2c', 1.85, 0.09, 1.25);
   $$('.t2c').forEach((el, i) => tl.fromTo(el, { z: -260, rotationY: (i - 2) * -9 }, { z: 0, rotationY: 0, duration: 2.0, ease: 'expo.out', immediateRender: true }, 1.85 + i * 0.09));
-  gleam('.t2c', 2.9, 0.07);
   burst(2.6, 960, 520, 110, 3);
-  rise('#aEng', 2.6, 0, 1.1);
+  tl.set('#aEng', { autoAlpha: 1 }, 2.6);
+  scramble('#aEng', 2.6, 1.0);
   fly('#datepill', { y: 40 }, 2.95, 1.1);
   fxTo(2.5, 0.35, { flare: 1 }); fxTo(2.5, 1.8, { flareX: 2300 }, 'power1.inOut'); fxTo(3.6, 0.7, { flare: 0 });
 
@@ -200,10 +249,12 @@
   tl.fromTo('#huhuCard', { autoAlpha: 1, clipPath: 'inset(100% 0% 0% 0% round 26px)' }, { clipPath: 'inset(-25% -25% -30% -25% round 26px)', duration: 1.4, ease: 'expo.inOut', immediateRender: true }, 6.05);
   tl.fromTo('#huhuCard .pic', { scale: 1.2 }, { scale: 1, duration: 2.4, ease: 'expo.out', immediateRender: true }, 6.05);
   header('#gB', 6.45);
-  rise('#nameB', 6.95, 0.06, 1.15);
-  gleam('#nameB', 7.9, 0.05);
-  rise('#gB .role', 7.6, 0, 1.0);
-  fly('#gB .cred', { x: -60 }, 8.1, 1.1, EASE, 0.35);
+  typewriter('#nameB1', 6.9, 12);
+  slam('#nameB2', 7.25, 0.12);
+  gleam('#nameB2', 8.1, 0.08);
+  rise('#gB .role', 7.75, 0, 1.0);
+  $$('#gB .cred').forEach((el, i) => { typewriter(el, 8.2 + i * 0.75, 34); });
+  marker('#gB', 8.65, 0.75);
   mv(6.4, 5.0, { ...at('gB', 60, -100, 1270), yaw: -3 }, 'sine.inOut');
   mv(11.4, 3.0, { ...at('gB', 440, 0, 1000), yaw: -2 }, 'power2.inOut');
 
@@ -220,6 +271,10 @@
   unveil('#run2', 16.9, -1);
   mv(17.2, 1.5, { ...at('gC', 40, -60, 1350), yaw: 0 }, 'power3.inOut');
   header('#gC', 17.6);
+  slideSkew('#cL1', 17.95, 1);
+  slideSkew('#cL2', 18.2, -1);
+  gleam('#cL1', 18.9);
+  fly('#cBg', { x: -500 }, 17.0, 6.4, 'power1.out');
   mv(18.7, 2.4, { ...at('gC', 60, -60, 1300), yaw: 0.5 }, 'sine.inOut');
   mv(21.1, 2.0, { ...at('gC', 420, 250, 860), yaw: -5 }, 'power2.inOut');
 
@@ -235,6 +290,7 @@
   unveil('#party1', 23.5);
   unveil('#party2', 23.8, -1);
   header('#gD', 24.1);
+  tl.fromTo(chars('#dL2'), { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5, ease: 'expo.out', stagger: 0.05, immediateRender: true }, 25.3);
   fly('#eq', { y: 260 }, 23.9, 1.2);
   for (let b = 24.5; b < 30.4; b += 0.5) beats.push(b);
   for (let b = 25.0; b < 30.4; b += 1.0) flash(b, 0.06, 9);
@@ -252,6 +308,9 @@
   cut(30.8, { ...at('gE', -880, -90, 1260), yaw: -6, pitch: 0, roll: 0 });
   mv(30.8, 6.7, { ...at('gE', 1520, -20, 1160), yaw: 7 }, 'power1.inOut');
   header('#gE', 30.95);
+  typewriter('#gE .tag', 31.15, 12);
+  popIn('#eL1', 31.5, 0.1);
+  fly('#eBg', { x: 600 }, 30.8, 7.0, 'power1.out');
   ['#tile1', '#tile2', '#tile3', '#tile4'].forEach((s, i) => {
     unveil(s, 31.3 + i * 1.15, 1);
     tl.fromTo(`${s} .cap`, { y: 30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.0, ease: EASE, immediateRender: true }, 31.9 + i * 1.15);
@@ -269,6 +328,8 @@
   unveil('#frozen2', 37.95, -1);
   fly('#gF .flake', { scale: 0.2, rotation: -60 }, 37.7, 1.6, EASE, 0.08);
   header('#gF', 39.2);
+  blurIn('#fL1', 39.5, 0.08);
+  blurIn('#fL2', 40.0, 0.09);
 
   /* ---- H · 拉远回望 + 落版 (44.4 – 52) ---- */
   fxTo(44.2, 0.6, { hud: 0 });
@@ -278,11 +339,10 @@
   tl.fromTo('#lockup', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6, immediateRender: true }, 46.3);
   tl.fromTo('#view3d', { opacity: 1 }, { opacity: 0.08, duration: 1.2, ease: 'power2.inOut', immediateRender: false }, 46.2);
   tl.fromTo('#lockup .lg', { y: -30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.2, ease: EASE, immediateRender: true }, 46.4);
-  rise('#lockup .kicker', 46.55, 0, 1.1);
-  rise('#lockup .mega', 46.8, 0.09, 1.3);
-  gleam('#lockup .mega', 47.8, 0.07);
+  tracking('#lkKick', 46.5, 90, 22);
+  rise('#lkTitle', 46.8, 0.09, 1.3);
   burst(47.3, 960, 420, 140, 7);
-  rise('#lockup .eng', 47.3, 0, 1.1);
+  scramble('#lkEng', 47.3, 1.0);
   tl.fromTo('#lockup .datepill', { y: 30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.1, ease: EASE, immediateRender: true }, 47.55);
   tl.fromTo('#lockup .bar', { y: 120, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.3, ease: EASE, immediateRender: true }, 47.8);
 
@@ -296,14 +356,15 @@
   tl.set(cam, { x: 40, y: -1510, z: 9000 + 1320, yaw: -2, pitch: 1, roll: 1.2 }, 0);
   tl.to(cam, { x: 20, y: -1500, z: 9000 + 1100, yaw: 1, roll: -0.4, duration: 2.4, ease: 'sine.inOut' }, 0);
   tl.to(cam, { x: 0, y: -80, z: 7600, yaw: 0, pitch: 5, roll: -5, duration: 0.6, ease: 'power2.in' }, 2.4);
-  rise('#iTing', 0.15, 0, 0.9);
-  rise('#iL1', 0.4, 0.07, 1.0);
-  rise('#iL2', 0.9, 0.06, 1.0);
-  gleam('#iL1', 1.3, 0.05);
-  tl.fromTo('#iQ', { autoAlpha: 0, z: 140 + 700, rotation: -40 }, { autoAlpha: 1, z: 140, rotation: 10, duration: 0.55, ease: 'expo.out', immediateRender: true }, 1.4);
+  typewriter('#iTing', 0.1, 9);
+  slam('#iL1', 0.45, 0.09);
+  tl.fromTo(chars('#iL1o'), { opacity: 0, x: -20 }, { opacity: 0.55, x: 0, duration: 0.6, ease: 'expo.out', stagger: 0.09, immediateRender: true }, 0.75);
+  gleam('#iL1', 1.25, 0.05);
+  flipIn('#iL2', 0.95, 0.07);
+  tl.fromTo('#iQ', { autoAlpha: 0, z: 140 + 700, rotationY: -540 }, { autoAlpha: 1, z: 140, rotationY: 0, duration: 0.9, ease: 'expo.out', immediateRender: true }, 1.35);
   tl.fromTo('#iRing', { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 1.0, ease: 'expo.out', immediateRender: true }, 1.45);
   shake(1.5 - INTRO, 0.35);
-  out(['#iTing', '#iL1', '#iL2', '#iQ', '#iRing'], 2.5, 320, 0.3);
+  out(['#iTing', '#iL1', '#iL1o', '#iL2', '#iQ', '#iRing'], 2.5, 320, 0.3);
   fxTo(2.45, 0.55, { speed: 1 }, 'power2.in');
   fxTo(3.0, 0.6, { speed: 0 }, 'power2.out');
 
@@ -491,6 +552,19 @@
   const chNum = $('#hud .chapters .num'), chLbl = $('#hud .chapters .lbl'), chBars = $$('#hud .chapters .bars u');
   const partyEls = [$('#party1'), $('#party2')], flakes = $$('#gF .flake');
   const bloomB = $('#bloomB'), iQ = $('#iQ'), iRing = $('#iRing');
+  const rbEls = $$('.rb'), cursorEl = $('#iTing .cursor');
+  const dL1 = $('#dL1'), dL2 = $('#dL2'), dL2c = $$('.ch', dL2), eL1c = $$('#eL1 .ch');
+  const hlrA = $$('.t2c .hlr'), hlrL = $$('#lkTitle .hlr');
+  const SCR = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#/+*';
+  const hash = (a, b) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
+  // neon tube: unlit glow, stutter on, then hum with the beat
+  const NEON_ON = [[0, 0.05], [0.12, 0.17], [0.26, 0.29], [0.38, 0.62], [0.68, 99]];
+  const neon = (t, t0) => {
+    if (t < t0 - 0.6) return 0;
+    if (t < t0) return 0.07;
+    const u = t - t0;
+    return NEON_ON.some(([a, b]) => u >= a && u < b) ? 1 : 0.1;
+  };
 
   const sumEvents = (list, t) => { let a = 0; for (const [ti, amp, k] of list) if (t >= ti && t < ti + 2.5) a += amp * Math.exp(-(t - ti) * k); return a; };
   const beatPulse = t => { let p = 0; for (const b of beats) if (t >= b && t < b + 0.5) p = Math.exp(-(t - b) * 7); return p; };
@@ -574,6 +648,27 @@
       });
     }
 
+    // kinetic type driven per frame
+    for (const sc of scrambles) {
+      const txt = sc.el._txt, u = (t - sc.t0) / sc.dur;
+      let out = '';
+      if (u >= 1) out = txt;
+      else if (u > 0) {
+        const n = Math.floor(u * txt.length), f = Math.floor(t * 30);
+        for (let i = 0; i < txt.length; i++) out += i < n || txt[i] === ' ' ? txt[i] : (i < n + 6 ? SCR[Math.floor(hash(f, i) * SCR.length)] : '');
+      }
+      if (sc.el.textContent !== out) sc.el.textContent = out;
+    }
+    rbEls.forEach(el => { el.style.backgroundPosition = `${(t * 28) % 200}% 0`; });
+    if (cursorEl) cursorEl.style.opacity = t < -INTRO + 1.4 ? (Math.floor((t + INTRO) * 3) % 2 ? 0 : 1) : 0;
+    const sweepPos = (t0, period, i) => { const u = t - t0 - i * 0.07; if (u < 0) return 100; const k = (u / period) % 1; const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; return 100 - e * 100; };
+    hlrA.forEach((el, i) => { el.style.backgroundPosition = `${sweepPos(2.9, 2.6, i)}% 0`; });
+    hlrL.forEach((el, i) => { el.style.backgroundPosition = `${sweepPos(47.8, 2.6, i)}% 0`; });
+    dL1.style.opacity = neon(t, 24.6) * (0.9 + 0.1 * bp);
+    dL2.style.opacity = neon(t, 25.0);
+    if (t > 25.3 && t < 31) dL2c.forEach((c, i) => gsap.set(c, { y: -18 * beatPulse(t - i * 0.035) }));
+    if (t > 33 && t < 38) eL1c.forEach((c, i) => gsap.set(c, { y: Math.sin(t * 2.4 + i * 0.8) * 7 }));
+
     // overlays
     flashEl.style.opacity = clamp(sumEvents(flashes, t));
     haze.style.opacity = t < 0 ? clamp((t + 0.35) / 0.35) * 0.85 : 0.85 * Math.pow(1 - clamp(t / 1.3), 2);
@@ -616,6 +711,9 @@
   /* ---------------- boot ---------------- */
   async function ready() {
     await Promise.all(['300 20px NS', '500 20px NS', '700 20px NS', '900 20px NS', '600 20px MS', '700 20px MS', '800 20px MS'].map(f => document.fonts.load(f, '亲子彩虹跑ABC0123')));
+    const txt = sel => $$(sel).map(e => e.textContent).join('') + '？';
+    await document.fonts.load('400 40px "Smiley Sans Oblique"', txt('.sm'));
+    await document.fonts.load('400 40px "YouSheBiaoTiHei"', txt('.ys'));
     await document.fonts.ready;
     await Promise.all(cloudImgs.map(im => im.decode().catch(() => {})));
     buildTints();
