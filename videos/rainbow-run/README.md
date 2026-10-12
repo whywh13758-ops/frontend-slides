@@ -30,7 +30,7 @@
 
 ## 待补
 
-- 虎虎照片：把主海报存成 `assets/huhu.png`（竖图，约 3:4，人物上半身）后重新渲染即可替换占位图。
+- 虎虎照片已从主海报（`src/p00-huhu.webp`）裁出：`assets/huhu.jpg`（竖图）和 `assets/huhu-face.jpg`（头像）。
 
 ## v4（参考片风格，当前版本）
 

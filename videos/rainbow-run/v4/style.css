@@ -61,7 +61,7 @@ svg { display: block; }
 
 /* art tiles */
 .art { position: absolute; overflow: hidden; border-radius: 24px; background: linear-gradient(160deg, #6fb6ff, #a9d8ff 55%, #f2d27e); }
-.art img, .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.art img, .photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; display: block; }
 .art.round { border-radius: 50%; }
 .holdart { position: absolute; inset: 0; display: none; background:
   radial-gradient(circle at 50% 38%, rgba(255,255,255,.9) 0 17%, transparent 17.5%),
@@ -104,7 +104,7 @@ svg { display: block; }
 
 /* star guest */
 #Lstar { width: 1560px; height: 820px; color: #fff; }
-#Lstar .photo { position: absolute; left: 40px; top: 40px; width: 560px; height: 740px; border-radius: 32px; overflow: hidden; background: linear-gradient(170deg, #6fb6ff, #a9d8ff 60%, #f2d27e); }
+#Lstar .photo { position: absolute; left: 40px; top: 40px; width: 560px; height: 740px; border-radius: 32px; overflow: hidden; box-shadow: 0 0 0 1.5px rgba(255,255,255,.18); background: linear-gradient(170deg, #6fb6ff, #a9d8ff 60%, #f2d27e); }
 #Lstar .col { position: absolute; left: 660px; top: 64px; width: 860px; }
 #Lstar .lab { display: flex; align-items: center; gap: 20px; font-family: 'MS', sans-serif; font-weight: 600; font-size: 24px; letter-spacing: 8px; color: var(--mute); }
 #Lstar .lab i { width: 60px; height: 2px; background: var(--mute); }
@@ -112,10 +112,10 @@ svg { display: block; }
 #Lstar .nm { display: flex; align-items: flex-end; gap: 26px; margin-top: 30px; white-space: nowrap; }
 #Lstar .n1 { font-family: 'Smiley Sans Oblique', sans-serif; font-size: 104px; line-height: 1; color: transparent; -webkit-text-stroke: 2.5px #fff; padding-bottom: 18px; }
 #Lstar .n2 { font-family: 'YouSheBiaoTiHei', sans-serif; font-size: 220px; line-height: .9; }
-#Lstar .date { display: inline-flex; align-items: baseline; gap: 18px; margin-top: 22px; padding: 12px 34px 14px; border-radius: 40px; border: 2px solid var(--gold-2); background: rgba(255,211,107,.1); }
+#Lstar .date { display: inline-flex; align-items: baseline; gap: 18px; margin-top: 14px; padding: 12px 34px 14px; border-radius: 40px; border: 2px solid var(--gold-2); background: rgba(255,211,107,.1); }
 #Lstar .date b { font-size: 50px; font-weight: 900; color: var(--gold-2); letter-spacing: 2px; }
 #Lstar .date span { font-size: 34px; font-weight: 700; letter-spacing: 4px; }
-#Lstar .rows { position: relative; margin-top: 30px; }
+#Lstar .rows { position: relative; margin-top: 10px; }
 #Lstar .rows .hover { position: absolute; left: -20px; right: 0; top: 0; height: 86px; border-radius: 20px; background: rgba(255,255,255,.09); opacity: 0; }
 #Lstar .row { position: relative; height: 86px; display: flex; align-items: center; gap: 22px; font-size: 34px; font-weight: 500; white-space: nowrap; }
 #Lstar .row svg { width: 34px; height: 34px; color: var(--gold-2); flex: none; }
