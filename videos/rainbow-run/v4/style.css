@@ -147,14 +147,36 @@ svg { display: block; }
 
 /* photo viewer: photo shown at a size the source can hold, over a blurred wash of itself */
 #Lview { width: 1500px; height: 840px; color: #fff; }
-#Lview .strip { position: absolute; left: 0; top: 0; height: 840px; display: flex; }
-#Lview .pg { position: relative; width: 1500px; height: 840px; overflow: hidden; flex: none; background: #0b0f1e; }
-#Lview .bgi { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.08); }
-#Lview .fg { position: absolute; top: 92px; border-radius: 22px; overflow: hidden; box-shadow: 0 34px 70px rgba(0,0,0,.45), 0 0 0 1.5px rgba(255,255,255,.25); }
-#Lview .fg img { width: 100%; height: 100%; object-fit: cover; display: block; }
-#Lview .pg.night .bgi { filter: hue-rotate(-20deg) saturate(1.3); }
-#Lview .pg.night .fg { box-shadow: 0 0 0 2px rgba(255,120,220,.55), 0 0 60px rgba(255,80,210,.45), 0 34px 70px rgba(0,0,0,.5); }
-#Lview .pg.ice .fg { box-shadow: 0 0 50px rgba(255,255,255,.55), 0 34px 70px rgba(0,0,0,.35); }
+#Lview .bgs, #Lview .mode { position: absolute; inset: 0; }
+#Lview .bgs { background: #0b0f1e; overflow: hidden; }
+#Lview .bgs img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.08); opacity: 0; }
+#Lview .fg { position: absolute; left: 268px; top: 92px; width: 963px; height: 470px; border-radius: 22px; overflow: hidden; box-shadow: 0 34px 70px rgba(0,0,0,.45), 0 0 0 1.5px rgba(255,255,255,.25); }
+#Lview .fg .z, #Lview .fg img { position: absolute; inset: 0; width: 100%; height: 100%; }
+#Lview .fg img { object-fit: cover; display: block; }
+#Lview .finger { position: absolute; left: 0; top: 0; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; background: rgba(255,255,255,.45); border: 3px solid #fff; box-shadow: 0 6px 18px rgba(0,0,0,.3); opacity: 0; }
+#Lview #bBox { --neon: #ff4fd0; box-shadow: 0 0 0 3px var(--neon), 0 0 60px var(--neon), 0 34px 70px rgba(0,0,0,.55); }
+#bBox img { will-change: transform; }
+#bBox .bars { position: absolute; left: 18px; right: 18px; top: 14px; display: flex; gap: 6px; z-index: 2; }
+#bBox .bars i { position: relative; flex: 1; height: 5px; border-radius: 3px; background: rgba(255,255,255,.35); overflow: hidden; }
+#bBox .bars u { position: absolute; inset: 0; background: #fff; transform-origin: 0 50%; transform: scaleX(0); }
+#bBox .live { position: absolute; left: 20px; top: 34px; display: flex; align-items: center; gap: 12px; z-index: 2; font-size: 24px; font-weight: 700; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
+#bBox .live b { font-family: 'MS', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 2px; padding: 3px 10px; border-radius: 6px; background: #ff3b6b; }
+#mC .card { position: absolute; left: 700px; top: 66px; width: 580px; padding: 12px 12px 0; border-radius: 24px; background: #fff; box-shadow: 0 30px 60px rgba(0,0,0,.4); transform-origin: 50% 110%; }
+#mC .card img { display: block; width: 556px; height: 470px; object-fit: cover; border-radius: 15px; }
+#mC .card span { display: block; height: 70px; line-height: 70px; text-align: center; font-family: 'Smiley Sans Oblique', sans-serif; font-size: 40px; color: var(--ink); letter-spacing: 2px; }
+#mD { perspective: 2200px; }
+#mD .flip { position: absolute; left: 540px; top: 72px; width: 900px; height: 439px; transform-style: preserve-3d; }
+#mD .face { position: absolute; inset: 0; border-radius: 22px; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: 0 0 50px rgba(255,255,255,.5), 0 34px 70px rgba(0,0,0,.35); }
+#mD .face > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#mD .back { transform: rotateY(180deg); }
+#frost { position: absolute; inset: 0; --w: -260px;
+  -webkit-mask-image: linear-gradient(100deg, transparent calc(var(--w) - 20px), #000 calc(var(--w) + 200px));
+          mask-image: linear-gradient(100deg, transparent calc(var(--w) - 20px), #000 calc(var(--w) + 200px)); }
+#frost img { position: absolute; inset: -20px; width: calc(100% + 40px); height: calc(100% + 40px); object-fit: cover; filter: blur(14px) brightness(1.35) saturate(.35); }
+#frost i { position: absolute; inset: 0; background:
+  radial-gradient(ellipse at 30% 30%, rgba(255,255,255,.75), rgba(220,240,255,.55) 45%, rgba(190,225,255,.62) 100%),
+  repeating-linear-gradient(62deg, rgba(255,255,255,.0) 0 22px, rgba(255,255,255,.22) 22px 24px),
+  repeating-linear-gradient(-48deg, rgba(255,255,255,.0) 0 34px, rgba(255,255,255,.18) 34px 36px); }
 #Lview .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 14%, rgba(0,0,0,0) 58%, rgba(0,8,30,.55) 100%); }
 #Lview .top { position: absolute; left: 56px; right: 56px; top: 30px; display: flex; justify-content: space-between; align-items: flex-start; }
 #Lview .when b { display: block; font-size: 30px; font-weight: 700; letter-spacing: 1px; }

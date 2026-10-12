@@ -18,7 +18,7 @@
   const NAVY = '#0c1631';
   const tl = gsap.timeline({ paused: true });
   const cam = { s: 1, x: 0, y: 0, rx: 0, ry: 0 };
-  const fx = { burst: 0, night: 0, vol: 20, eq: 0 };
+  const fx = { burst: 0, night: 0, vol: 20, eq: 0, bgi: 0, wipe: -260 };
   const island = $('#island');
 
   /* ---------- prep ---------- */
@@ -220,42 +220,120 @@
   tl.fromTo('#Lview .top, #Lview .film', { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out', immediateRender: true }, 20.3);
   cur(20.0, 0.8, 1560, 1000);
 
-  // swipes: [time, page]
-  const SW = [[22.2, 1], [23.9, 2], [26.0, 3], [27.5, 4], [28.8, 5], [30.0, 6], [31.2, 7], [32.7, 8], [34.5, 9]];
-  SW.forEach(([t, p]) => {
-    cur(t - 0.45, 0.35, 1420, 600, 'power2.out');
-    click(t - 0.08); S(t - 0.08, 'click', { g: 0.45 }); S(t, 'swipe');
-    tl.to('#cursor', { x: 640, duration: 0.5, ease: 'power3.inOut' }, t);
-    tl.to('#strip', { x: -1500 * p, duration: 0.72, ease: 'expo.inOut' }, t);
-    tl.to(cam, { ry: -2.4, duration: 0.36, ease: 'power2.out' }, t);
-    tl.to(cam, { ry: 0, duration: 0.6, ease: 'power2.inOut' }, t + 0.36);
-    tl.fromTo(`#strip .pg:nth-child(${p + 1}) .fg img`, { scale: 1.12 }, { scale: 1.0, duration: 3.2, ease: 'power2.out', immediateRender: false }, t);
-  });
-  tl.fromTo('#strip .pg:nth-child(1) .fg img', { scale: 1.12 }, { scale: 1.0, duration: 3.6, ease: 'power2.out', immediateRender: true }, 19.6);
-  // captions per event group
+  // viewer origin in camera space (island 1500×840 centred on 960,540)
+  const VX = 210, VY = 120;
+  const vc = (x, y) => [x + VX, y + VY];
+  gsap.set(['#mB', '#mC', '#mD'], { autoAlpha: 0 });
+  gsap.set('#a2', { clipPath: 'circle(0px at 632px 208px)' });
+  const setBg = (t, i) => tl.to(fx, { bgi: i, duration: 0.6, ease: 'power2.inOut' }, t);
   const capIn = (c, t) => {
     tl.set(`#Lview .cap[data-c="${c}"]`, { autoAlpha: 1 }, t);
     tl.fromTo(`#Lview .cap[data-c="${c}"] > *`, { opacity: 0, y: 50, filter: 'blur(10px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.7, ease: 'expo.out', stagger: 0.09, immediateRender: false }, t);
   };
   const capOut = (c, t) => tl.to(`#Lview .cap[data-c="${c}"]`, { autoAlpha: 0, filter: 'blur(10px)', duration: 0.3 }, t);
-  capIn(0, 20.55); capOut(0, 23.85);
-  capIn(1, 24.5); capOut(1, 27.45);
-  capIn(2, 27.85); capOut(2, 32.65);
-  capIn(3, 33.25);
-  [[27.6, 0], [28.9, 1], [30.1, 2], [31.3, 3]].forEach(([t, i], k, a) => {
-    tl.fromTo(`#showSub span:nth-child(${i + 1})`, { opacity: 0, y: 30, filter: 'blur(8px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.5, ease: 'expo.out', immediateRender: false }, t + 0.25);
-    if (k < a.length - 1) tl.to(`#showSub span:nth-child(${i + 1})`, { opacity: 0, y: -26, filter: 'blur(8px)', duration: 0.3 }, a[k + 1][0]);
-  });
-  tl.to(fx, { night: 1, duration: 0.7 }, 24.0);
-  tl.to(fx, { night: 0, duration: 0.7 }, 27.5);
-  // double-tap hearts
-  [[25.15, 1180, 520], [35.4, 1000, 470]].forEach(([t, x, y]) => {
+  const heartAt = (t, x, y) => {
     cur(t - 0.55, 0.45, x, y, 'power2.inOut');
     click(t - 0.12); click(t + 0.05); S(t - 0.12, 'click', { g: 0.45 }); S(t + 0.05, 'click', { g: 0.45 }); S(t + 0.1, 'heart');
     tl.fromTo('#heart', { scale: 0, opacity: 1, rotation: -12 }, { scale: 1, opacity: 1, rotation: 0, duration: 0.45, ease: 'back.out(2.6)', immediateRender: false }, t + 0.08);
     tl.to('#heart', { scale: 1.2, opacity: 0, y: -60, duration: 0.45, ease: 'power2.in' }, t + 0.75);
     tl.set('#heart', { y: 0 }, t + 1.3);
+  };
+
+  /* A · 亲子彩虹跑 — pinch to zoom, then tap: a powder burst reveals the next photo */
+  tl.fromTo('#a1 img', { scale: 1.12 }, { scale: 1.0, duration: 3.6, ease: 'power2.out', immediateRender: true }, 19.6);
+  capIn(0, 20.55);
+  const P1 = [[720, 300], [800, 360]], P2 = [[585, 215], [935, 445]];
+  cur(20.4, 0.5, 1400, 900);
+  tl.to('#cursor', { autoAlpha: 0, duration: 0.15 }, 20.95);
+  ['#f1', '#f2'].forEach((f, i) => {
+    tl.fromTo(f, { x: P1[i][0], y: P1[i][1], opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.2, immediateRender: true }, 21.0);
+    tl.to(f, { x: P2[i][0], y: P2[i][1], duration: 0.75, ease: 'power2.inOut' }, 21.15);
+    tl.to(f, { opacity: 0, scale: 0.5, duration: 0.2 }, 22.0);
   });
+  tl.to('#a1 .z', { scale: 1.55, transformOrigin: '47% 38%', duration: 0.75, ease: 'power2.inOut' }, 21.15);
+  tl.to('#a1 .z', { scale: 1.0, duration: 0.7, ease: 'back.out(1.5)' }, 22.05);
+  S(21.0, 'tick', { g: 0.5 }); S(21.15, 'whoosh', { dur: 0.75, dir: 1, g: 0.35 }); S(22.05, 'whoosh', { dur: 0.45, dir: -1, g: 0.3 });
+  tl.to('#cursor', { autoAlpha: 1, duration: 0.15 }, 22.1);
+  cur(22.15, 0.42, ...vc(900, 300), 'power3.out');
+  click(22.62); S(22.62, 'click'); S(22.62, 'thump'); S(22.64, 'sparkle'); S(22.66, 'whoosh', { dur: 0.6, dir: 1, g: 0.5 });
+  burst(22.62, ...vc(900, 300), 200, 21);
+  tl.fromTo('#a2', { clipPath: 'circle(0px at 632px 208px)' }, { clipPath: 'circle(1100px at 632px 208px)', duration: 0.75, ease: 'power2.out', immediateRender: false }, 22.65);
+  tl.fromTo('#a2 img', { scale: 1.25 }, { scale: 1.0, duration: 1.8, ease: 'power2.out', immediateRender: false }, 22.65);
+  setBg(22.65, 1);
+  cur(23.0, 0.6, 1520, 960);
+  capOut(0, 23.7);
+
+  /* B · 带娃蹦迪 — stories-style beat cuts with punch-ins and a colour-cycling neon frame */
+  tl.to('#mA', { scale: 1.25, autoAlpha: 0, filter: 'blur(10px)', duration: 0.45, ease: 'power2.in' }, 23.75);
+  S(23.75, 'whoosh', { dur: 0.5, dir: 1, g: 0.8 });
+  tl.fromTo('#mB', { autoAlpha: 0, scale: 0.82, filter: 'blur(14px)' }, { autoAlpha: 1, scale: 1, filter: 'blur(0px)', duration: 0.6, ease: 'expo.out', immediateRender: false }, 23.95);
+  tl.to(fx, { night: 1, duration: 0.6 }, 23.8);
+  setBg(23.9, 2);
+  capIn(1, 24.4);
+  const NEON = ['#ff4fd0', '#3fd8ff', '#a66bff', '#ffd84a'];
+  const CUTS = [ // [time, image, scale, origin] — cuts land on the 120 BPM grid
+    [23.95, 1, 1.0, '50% 50%'], [24.27, 2, 1.0, '50% 50%'], [24.77, 1, 1.5, '62% 28%'], [25.27, 2, 1.35, '35% 42%'],
+    [25.77, 1, 1.22, '30% 62%'], [26.27, 2, 1.55, '63% 34%'], [26.77, 1, 1.0, '50% 50%'], [27.27, 2, 1.15, '50% 45%']];
+  gsap.set('#b2', { autoAlpha: 0 });
+  CUTS.forEach(([t, im, sc, org], k) => {
+    const on = `#b${im}`, offEl = `#b${im === 1 ? 2 : 1}`;
+    tl.set(on, { autoAlpha: 1, zIndex: 1 }, t); tl.set(offEl, { autoAlpha: 0, zIndex: 0 }, t);
+    tl.fromTo(on, { scale: sc * 1.14, rotation: k % 2 ? 1.6 : -1.6, transformOrigin: org }, { scale: sc, rotation: 0, transformOrigin: org, duration: 0.45, ease: 'expo.out', immediateRender: false }, t);
+    tl.set('#bBox', { '--neon': NEON[k % 4] }, t);
+    const nxt = (CUTS[k + 1] || [27.45])[0];
+    tl.fromTo(`#bBox .bars i:nth-child(${k + 1}) u`, { scaleX: 0 }, { scaleX: 1, duration: nxt - t, ease: 'none', immediateRender: false }, t);
+    if (k) { flash(t, 0.14, 12); S(t, 'whoosh', { dur: 0.25, dir: 1, g: 0.22 }); setBg(t, im === 1 ? 2 : 3); }
+  });
+  heartAt(26.05, ...vc(760, 300));
+  capOut(1, 27.4);
+
+  /* C · 精彩演出 — a deck of cards, flicked away one by one */
+  tl.to('#mB', { scale: 0.6, y: 220, autoAlpha: 0, filter: 'blur(8px)', duration: 0.45, ease: 'power2.in' }, 27.45);
+  tl.to(fx, { night: 0, duration: 0.6 }, 27.5);
+  tl.set('#mC', { autoAlpha: 1 }, 27.5);
+  const SLOT = [{ rotation: -2, y: 0, scale: 1 }, { rotation: 4, y: 10, scale: 0.97 }, { rotation: -6, y: 20, scale: 0.94 }, { rotation: 7, y: 30, scale: 0.91 }];
+  [4, 3, 2, 1].forEach((n, i) => {
+    tl.fromTo(`#card${n}`, { y: -950, rotation: (i % 2 ? 20 : -20), scale: 1, opacity: 1 }, { ...SLOT[n - 1], duration: 0.6, ease: 'back.out(1.2)', immediateRender: true }, 27.55 + i * 0.08);
+    S(27.85 + i * 0.08, 'thump', { g: 0.35, p: 1 + i * 0.05 });
+  });
+  S(27.55, 'whoosh', { dur: 0.6, dir: -1, g: 0.6 });
+  setBg(27.6, 4);
+  capIn(2, 27.85);
+  const FLICK = [28.9, 30.1, 31.3];
+  FLICK.forEach((t, k) => {
+    cur(t - 0.55, 0.4, ...vc(990, 330), 'power3.out');
+    click(t - 0.1); S(t - 0.1, 'click', { g: 0.4 }); S(t + 0.05, 'swipe');
+    tl.to('#cursor', { x: vc(1530, 0)[0], y: vc(0, 190)[1], duration: 0.42, ease: 'power2.in' }, t);
+    tl.to(`#card${k + 1}`, { x: 1500, y: -300, rotation: 30, duration: 0.6, ease: 'power2.in' }, t + 0.04);
+    for (let n = k + 2; n <= 4; n++) tl.to(`#card${n}`, { ...SLOT[n - k - 2], duration: 0.5, ease: 'back.out(1.6)' }, t + 0.2);
+    setBg(t + 0.1, 5 + k);
+  });
+  [[27.6, 0], [28.9, 1], [30.1, 2], [31.3, 3]].forEach(([t, i], k, a) => {
+    tl.fromTo(`#showSub span:nth-child(${i + 1})`, { opacity: 0, y: 30, filter: 'blur(8px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.5, ease: 'expo.out', immediateRender: false }, t + 0.25);
+    if (k < a.length - 1) tl.to(`#showSub span:nth-child(${i + 1})`, { opacity: 0, y: -26, filter: 'blur(8px)', duration: 0.3 }, a[k + 1][0]);
+  });
+  capOut(2, 32.55);
+
+  /* D · 冰雪女王 — wipe the frost off, then flip the card over */
+  tl.to('#card4', { x: -1500, y: 260, rotation: -26, duration: 0.55, ease: 'power2.in' }, 32.55); S(32.55, 'swipe');
+  tl.fromTo('#mD', { autoAlpha: 0, scale: 0.75, filter: 'blur(14px)' }, { autoAlpha: 1, scale: 1, filter: 'blur(0px)', duration: 0.7, ease: 'expo.out', immediateRender: false }, 32.75);
+  S(32.8, 'sparkle'); S(32.75, 'whoosh', { dur: 0.6, dir: 1, g: 0.5 });
+  setBg(32.75, 8);
+  capIn(3, 33.25);
+  cur(32.9, 0.5, ...vc(560, 240), 'power3.out');
+  tl.to('#cursor', { keyframes: [
+    { x: vc(760, 0)[0], y: vc(0, 420)[1], duration: 0.22 }, { x: vc(900, 0)[0], y: vc(0, 130)[1], duration: 0.22 },
+    { x: vc(1060, 0)[0], y: vc(0, 430)[1], duration: 0.22 }, { x: vc(1210, 0)[0], y: vc(0, 140)[1], duration: 0.22 },
+    { x: vc(1360, 0)[0], y: vc(0, 420)[1], duration: 0.22 }, { x: vc(1460, 0)[0], y: vc(0, 260)[1], duration: 0.2 }], ease: 'sine.inOut' }, 33.45);
+  tl.fromTo(fx, { wipe: -260 }, { wipe: 1120, duration: 1.3, ease: 'none', immediateRender: false }, 33.45);
+  S(33.45, 'sparkle'); S(33.9, 'sparkle'); S(34.35, 'sparkle');
+  for (let i = 0; i < 6; i++) S(33.45 + i * 0.22, 'whoosh', { dur: 0.2, dir: i % 2 ? -1 : 1, g: 0.18 });
+  cur(34.6, 0.3, ...vc(990, 290), 'power2.out');
+  click(34.95); S(34.95, 'click'); S(35.0, 'whoosh', { dur: 0.8, dir: 1, g: 0.7 }); S(35.55, 'chime', { g: 0.5 });
+  tl.to('#dFlip', { rotationY: 180, duration: 0.85, ease: 'expo.inOut' }, 35.0);
+  tl.to('#dFlip', { keyframes: [{ scale: 0.9, duration: 0.42, ease: 'power2.in' }, { scale: 1, duration: 0.5, ease: 'back.out(2)' }] }, 35.0);
+  setBg(35.15, 9);
+  heartAt(36.25, ...vc(990, 300));
   focus(20.4, 16.8, 960, 540, 1.035, 'sine.inOut');
 
   /* ---- 5 · 落版 (37.4 – 47) ---- */
@@ -304,7 +382,8 @@
     party: [23.9 + MORE, 27.5 + MORE], frozen: [32.7 + MORE, 37.4 + MORE] };
   // fast segments get sub-frame motion blur in render.cjs
   window.FAST = [[0.9, 1.1], [1.3, 2.0], [3.5, 4.2], [4.3, 5.0], [5.85, 6.6], [7.2, 8.0], [8.9, 9.5], [9.7, 11.7], [17.6, 18.5], [18.9, 19.4],
-    ...[[17.6, 18.5], [19.5, 20.4], ...SW.map(([t]) => [t - 0.1, t + 0.8]), [37.4, 38.3], [39.0, 39.9]].map(([a, b]) => [a + MORE, b + MORE])];
+    ...[[17.6, 18.5], [19.5, 20.4], [21.1, 21.95], [22.05, 22.5], [22.6, 23.4], [23.7, 24.4], ...CUTS.slice(1).map(([t]) => [t - 0.02, t + 0.25]), [27.4, 28.2],
+      ...FLICK.map(t => [t - 0.05, t + 0.7]), [32.5, 33.3], [34.95, 35.9], [37.4, 38.3], [39.0, 39.9]].map(([a, b]) => [a + MORE, b + MORE])];
 
   /* ======================================================================
      PARTICLES
@@ -335,7 +414,8 @@
   const spin = $('#Lspin svg'), waves = $$('.wave i');
   const pFill = $('#pFill'), pKnob = $('#pKnob'), pT0 = $('#pT0'), pT1 = $('#pT1'), nowFill = $('#nowFill');
   const vFill = $('#vFill'), vKnob = $('#vKnob'), vNum = $('#vNum');
-  const eqBars = [...eq.children], strip = $('#strip'), film = $$('#film i'), vWhen = $('#vWhen'), vIdx = $('#vIdx');
+  const eqBars = [...eq.children], film = $$('#film i'), vWhen = $('#vWhen'), vIdx = $('#vIdx');
+  const bgImgs = $$('#bgs img'), frost = $('#frost');
   const rbx = $$('.rb, .rbx');
   const TYPE = [[0, ''], [1.08, '吉'], [1.22, '吉安'], [2.2, '吉安周'], [2.34, '吉安周末'], [3.62, '听说 吉安周末有大事发生？']];
   const WHEN = ['10月17日 17:00 · 亲子彩虹跑', '10月17日 17:00 · 亲子彩虹跑', '10月17日 20:00 · 乐队欢乐party', '10月17日 20:00 · 乐队欢乐party',
@@ -393,9 +473,11 @@
     }
     rbx.forEach(e => { e.style.backgroundPosition = `${(t * 26) % 200}% 0`; });
 
-    // photo viewer chrome follows the strip
-    const sx = -gsap.getProperty(strip, 'x') / 1500;
+    // photo viewer chrome follows the current photo
+    const sx = fx.bgi;
     const idx = clamp(Math.round(sx), 0, 9);
+    bgImgs.forEach((im, i) => { im.style.opacity = clamp(1 - Math.abs(i - sx)); });
+    frost.style.setProperty('--w', fx.wipe.toFixed(1) + 'px');
     if (vWhen.textContent !== WHEN[idx]) vWhen.textContent = WHEN[idx];
     vIdx.textContent = idx + 1;
     film.forEach((f, i) => { const k = clamp(1 - Math.abs(i - sx)); f.style.opacity = 0.45 + 0.55 * k; f.style.transform = `scale(${1 + 0.28 * k})`; f.style.boxShadow = `0 0 0 ${2 * k}px rgba(255,255,255,${k})`; });

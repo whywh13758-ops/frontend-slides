@@ -131,17 +131,45 @@
 
       <!-- photo viewer -->
       <div class="L" id="Lview">
-        <div class="strip" id="strip">
-          <div class="pg "><img class="bgi" src="../assets/run1-bg.jpg"><div class="fg" style="width:963px;height:470px;left:268px"><img src="../assets/run1.jpg"></div></div>
-          <div class="pg "><img class="bgi" src="../assets/run2-bg.jpg"><div class="fg" style="width:963px;height:470px;left:268px"><img src="../assets/run2.jpg"></div></div>
-          <div class="pg night"><img class="bgi" src="../assets/party1-bg.jpg"><div class="fg" style="width:963px;height:470px;left:268px"><img src="../assets/party1.jpg"></div></div>
-          <div class="pg night"><img class="bgi" src="../assets/party2-bg.jpg"><div class="fg" style="width:963px;height:470px;left:268px"><img src="../assets/party2.jpg"></div></div>
-          <div class="pg "><img class="bgi" src="../assets/show1-clean-bg.jpg"><div class="fg" style="width:543px;height:470px;left:478px"><img src="../assets/show1-clean.jpg"></div></div>
-          <div class="pg "><img class="bgi" src="../assets/show2-clean-bg.jpg"><div class="fg" style="width:557px;height:470px;left:471px"><img src="../assets/show2-clean.jpg"></div></div>
-          <div class="pg "><img class="bgi" src="../assets/show3-clean-bg.jpg"><div class="fg" style="width:556px;height:470px;left:472px"><img src="../assets/show3-clean.jpg"></div></div>
-          <div class="pg "><img class="bgi" src="../assets/show4-clean-bg.jpg"><div class="fg" style="width:547px;height:470px;left:476px"><img src="../assets/show4-clean.jpg"></div></div>
-          <div class="pg ice"><img class="bgi" src="../assets/frozen1-bg.jpg"><div class="fg" style="width:963px;height:470px;left:268px"><img src="../assets/frozen1.jpg"></div></div>
-          <div class="pg ice"><img class="bgi" src="../assets/frozen2-bg.jpg"><div class="fg" style="width:963px;height:470px;left:268px"><img src="../assets/frozen2.jpg"></div></div>
+        <div class="bgs" id="bgs">
+          <img src="../assets/run1-bg.jpg" alt="">
+          <img src="../assets/run2-bg.jpg" alt="">
+          <img src="../assets/party1-bg.jpg" alt="">
+          <img src="../assets/party2-bg.jpg" alt="">
+          <img src="../assets/show1-clean-bg.jpg" alt="">
+          <img src="../assets/show2-clean-bg.jpg" alt="">
+          <img src="../assets/show3-clean-bg.jpg" alt="">
+          <img src="../assets/show4-clean-bg.jpg" alt="">
+          <img src="../assets/frozen1-bg.jpg" alt="">
+          <img src="../assets/frozen2-bg.jpg" alt="">
+        </div>
+        <!-- A · 彩虹跑：双指放大 → 点一下彩粉炸开，下一张圆形展开 -->
+        <div class="mode" id="mA">
+          <div class="fg" id="a1"><div class="z"><img src="../assets/run1.jpg" alt=""></div></div>
+          <div class="fg" id="a2"><div class="z"><img src="../assets/run2.jpg" alt=""></div></div>
+          <div class="finger" id="f1"></div><div class="finger" id="f2"></div>
+        </div>
+        <!-- B · 带娃蹦迪：Stories 卡点快切 -->
+        <div class="mode" id="mB">
+          <div class="fg" id="bBox">
+            <img id="b1" src="../assets/party1.jpg" alt=""><img id="b2" src="../assets/party2.jpg" alt="">
+            <div class="bars"><i><u></u></i><i><u></u></i><i><u></u></i><i><u></u></i><i><u></u></i><i><u></u></i><i><u></u></i><i><u></u></i></div>
+            <div class="live"><b>LIVE</b><span>派对现场</span></div>
+          </div>
+        </div>
+        <!-- C · 精彩演出：卡片一张张甩飞 -->
+        <div class="mode" id="mC">
+          <div class="card" id="card4"><img src="../assets/show4-clean.jpg" alt=""><span>梦幻泡泡秀</span></div>
+          <div class="card" id="card3"><img src="../assets/show3-clean.jpg" alt=""><span>多彩十米长画</span></div>
+          <div class="card" id="card2"><img src="../assets/show2-clean.jpg" alt=""><span>神奇科学魔术秀</span></div>
+          <div class="card" id="card1"><img src="../assets/show1-clean.jpg" alt=""><span>爆笑小丑表演</span></div>
+        </div>
+        <!-- D · 冰雪女王：擦掉冰霜 → 3D 翻面 -->
+        <div class="mode" id="mD">
+          <div class="flip" id="dFlip">
+            <div class="face front"><img src="../assets/frozen1.jpg" alt=""><div class="frost" id="frost"><img src="../assets/frozen1.jpg" alt=""><i></i></div></div>
+            <div class="face back"><img src="../assets/frozen2.jpg" alt=""></div>
+          </div>
         </div>
         <div class="shade"></div>
         <div class="top">
