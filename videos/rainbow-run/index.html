@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>亲子彩虹跑 · 宣传片</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="og" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb347"/><stop offset=".55" stop-color="#ff8a1e"/><stop offset="1" stop-color="#ff7410"/></linearGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f9bff"/><stop offset="1" stop-color="#1e5bd8"/></linearGradient>
+    <symbol id="star" viewBox="0 0 100 100"><path d="M50 4 62 36 96 37 69 58 79 92 50 72 21 92 31 58 4 37 38 36Z" fill="#ffd83a" stroke="#ff9f1a" stroke-width="5" stroke-linejoin="round"/><path d="M50 18 57 40 78 41" fill="none" stroke="#fff6b0" stroke-width="5" stroke-linecap="round"/></symbol>
+    <symbol id="ribbonShape" viewBox="0 0 1000 160" preserveAspectRatio="none">
+      <path d="M48 26 C300 8 700 4 958 16 L1000 80 L958 148 C700 158 300 158 36 148 L0 84 Z" fill="#d9580b" transform="translate(10 12)"/>
+      <path d="M48 26 C300 8 700 4 958 16 L1000 80 L958 148 C700 158 300 158 36 148 L0 84 Z" fill="url(#og)"/>
+      <path d="M70 36 C320 20 680 16 930 26" fill="none" stroke="#ffd59a" stroke-width="7" stroke-linecap="round" opacity=".8"/>
+    </symbol>
+    <symbol id="flakeShape" viewBox="-50 -50 100 100">
+      <g stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none">
+        <path d="M0-44V44M-38-22 38 22M-38 22 38-22"/>
+        <path d="M0-30-9-39M0-30 9-39M0 30-9 39M0 30 9 39M-26-15-26-28M-26-15-38-9M26 15 26 28M26 15 38 9M-26 15-38 9M-26 15-26 28M26-15 38-9M26-15 26-28"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="viewport"><div id="stage">
+
+  <!-- screen-space sky -->
+  <div class="layer" id="sky"><div class="grad"></div><img class="rays" src="assets/rays-sky.png" alt=""><div class="sun"></div></div>
+  <div class="layer" id="night">
+    <div class="glow"></div>
+    <div class="beam" style="left:12%;background:linear-gradient(0deg,rgba(255,80,200,.9),rgba(255,80,200,0))"></div>
+    <div class="beam" style="left:32%;background:linear-gradient(0deg,rgba(90,230,255,.9),rgba(90,230,255,0))"></div>
+    <div class="beam" style="left:50%;background:linear-gradient(0deg,rgba(255,230,90,.9),rgba(255,230,90,0))"></div>
+    <div class="beam" style="left:68%;background:linear-gradient(0deg,rgba(140,110,255,.9),rgba(140,110,255,0))"></div>
+    <div class="beam" style="left:88%;background:linear-gradient(0deg,rgba(255,80,200,.9),rgba(255,80,200,0))"></div>
+  </div>
+  <div class="layer" id="ice"><div class="frost"></div></div>
+  <canvas id="fxBack" width="1920" height="1080"></canvas>
+
+  <!-- 3D world -->
+  <div id="view3d"><div id="world">
+
+    <!-- I · 开场钩子 -->
+    <div class="g" id="gI" data-p="0,-1500,9000">
+      <div class="o emph" id="iBurst" data-p="560,40,60"><svg width="900" height="900" viewBox="-450 -450 900 900" id="iBurstSvg"></svg></div>
+      <div class="o bubble" id="iTing" data-p="-560,-260,80" data-r="0,0,-6">听说</div>
+      <div class="o tc" id="iL1" data-p="-130,-40,0" style="font-size:230px"><span>吉</span><span>安</span><span>周</span><span>末</span></div>
+      <div class="o tc tcy" id="iL2" data-p="-130,200,40" style="font-size:150px"><span>有</span><span>大</span><span>事</span><span>发</span><span>生</span></div>
+      <div class="o qmark" id="iQ" data-p="560,40,140" data-r="0,0,12">？</div>
+    </div>
+
+    <!-- A · 片头标题 -->
+    <div class="g" id="gA" data-p="0,0,0">
+      <div class="o" id="rainbow" data-p="0,320,-2800">
+        <svg width="7200" height="3700" viewBox="0 0 7200 3700" fill="none" stroke-linecap="butt">
+          <path class="arc" d="M100 3700 A3500 3500 0 0 1 7100 3700" stroke="#f23b2e" stroke-width="122"/>
+          <path class="arc" d="M230 3700 A3370 3370 0 0 1 6970 3700" stroke="#ff9a1f" stroke-width="122"/>
+          <path class="arc" d="M360 3700 A3240 3240 0 0 1 6840 3700" stroke="#ffd93b" stroke-width="122"/>
+          <path class="arc" d="M490 3700 A3110 3110 0 0 1 6710 3700" stroke="#5cc24a" stroke-width="122"/>
+          <path class="arc" d="M620 3700 A2980 2980 0 0 1 6580 3700" stroke="#2e8bea" stroke-width="122"/>
+          <path class="arc" d="M750 3700 A2850 2850 0 0 1 6450 3700" stroke="#8b5cd6" stroke-width="122"/>
+        </svg>
+      </div>
+      <div class="o tc sm t1c" data-p="-264,-270,0" style="font-size:124px">派</div>
+      <div class="o tc sm t1c" data-p="-132,-270,0" style="font-size:124px">星</div>
+      <div class="o tc sm t1c" data-p="0,-270,0" style="font-size:124px">天</div>
+      <div class="o tc sm t1c" data-p="132,-270,0" style="font-size:124px">护</div>
+      <div class="o tc sm t1c" data-p="264,-270,0" style="font-size:124px">节</div>
+      <div class="o tc t2c" data-p="-570,20,0" style="font-size:280px">亲</div>
+      <div class="o tc t2c" data-p="-285,20,0" style="font-size:280px">子</div>
+      <div class="o tc t2c" data-p="0,20,0" style="font-size:280px">彩</div>
+      <div class="o tc t2c" data-p="285,20,0" style="font-size:280px">虹</div>
+      <div class="o tc t2c" data-p="570,20,0" style="font-size:280px">跑</div>
+      <div class="o accent acc" data-p="-760,-90,40" data-r="0,0,-52" style="background:#f23b2e;width:150px"></div>
+      <div class="o accent acc" data-p="-40,-60,40" data-r="0,0,-28" style="background:#5cc24a;width:110px"></div>
+      <div class="o accent acc" data-p="250,-120,40" data-r="0,0,58" style="background:#ffd93b;width:130px"></div>
+      <div class="o accent acc" data-p="330,120,40" data-r="0,0,12" style="background:#f23b2e;width:120px"></div>
+      <div class="o accent acc" data-p="780,-60,40" data-r="0,0,-38" style="background:#2e8bea;width:150px"></div>
+      <div class="o accent acc" data-p="-420,-330,40" data-r="0,0,24" style="background:#2e8bea;width:90px"></div>
+      <div class="o accent acc" data-p="430,-340,40" data-r="0,0,-30" style="background:#f23b2e;width:80px"></div>
+      <div class="o accent acc" data-p="-730,190,40" data-r="0,0,-12" style="background:#5cc24a;width:120px"></div>
+      <div class="o datepill" id="datepill" data-p="0,270,30">10月16-18日 · 吉安新世界广场来斯百货</div>
+    </div>
+
+    <!-- B · 青鸟飞鱼-虎虎 -->
+    <div class="g" id="gB" data-p="4200,0,-800">
+      <img class="o rays-disc" id="raysB" data-p="440,-40,-520" src="assets/rays-disc.png" alt="">
+      <div class="o huge" id="hugeB" data-p="200,-60,-1150" style="font-size:760px">10.17</div>
+      <div class="o card" id="huhuCard" data-p="440,40,0" data-r="0,-10,0">
+        <div class="pic">
+          <img id="huhuImg" src="assets/huhu.png" alt="">
+          <div class="ph"><em>虎虎 · 照片位</em>
+            <svg viewBox="0 0 200 220"><circle cx="100" cy="70" r="46" fill="rgba(255,255,255,.75)"/><path d="M10 220 C14 150 52 124 100 124 C148 124 186 150 190 220Z" fill="rgba(255,255,255,.75)"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="o nametag" id="nametag" data-p="810,150,90" data-r="0,-10,4"><div class="y">虎虎</div><div class="b">合生元品牌好友</div></div>
+      <div class="o pill" id="pillB" data-ax="0" data-p="-800,-330,140"><svg class="star"><use href="#star"/></svg>10月17日 · 明星见面会</div>
+      <div class="o tc" id="nameB" data-ax="0" data-p="-860,-165,180" style="font-size:132px"><span>青</span><span>鸟</span><span>飞</span><span>鱼</span><span>-</span><span>虎</span><span>虎</span></div>
+      <div class="o strip stripB" data-ax="0" data-p="-850,20,220" data-r="0,0,-2" style="font-size:42px">仙剑奇侠传3插曲<b>《此生不换》</b>演唱者</div>
+      <div class="o strip stripB" data-ax="0" data-p="-835,128,255" data-r="0,0,-2" style="font-size:42px">组合曾获 <b>音乐风云榜最佳新人EP</b></div>
+      <div class="o strip stripB" data-ax="0" data-p="-820,236,290" data-r="0,0,-2" style="font-size:42px">组合曾获 <b>第17届东方风云榜·东方新人银奖</b></div>
+    </div>
+
+    <!-- C · 亲子彩虹跑 -->
+    <div class="g" id="gC" data-p="8600,300,-300">
+      <div class="o pill" id="pillC" data-ax="0" data-p="-820,-350,140"><svg class="star"><use href="#star"/></svg>10月17日 17:00 · 亲子彩虹跑</div>
+      <div class="o banner" id="banC" data-ax="0" data-p="-850,-222,140"><span>全家出马 欢跑彩色马拉松</span></div>
+      <div class="o photo" id="run1" data-p="-330,210,40" data-r="0,9,0"><img src="assets/run1.jpg" width="900" height="439"></div>
+      <div class="o photo" id="run2" data-p="470,275,-200" data-r="0,-9,0"><img src="assets/run2.jpg" width="900" height="442"></div>
+    </div>
+
+    <!-- C2 · 0.1元装备包 -->
+    <div class="g" id="gC2" data-p="8600,2600,-300">
+      <div class="o big01" id="big01" data-p="0,-300,200">0.1<small>元</small></div>
+      <div class="o ribbon" id="ribC2" data-p="0,-110,240"><svg><use href="#ribbonShape"/></svg><span>购亲子彩虹跑装备包</span></div>
+      <div class="ring" id="ring" data-p="0,230,-380">
+        <div class="slot"><div class="o kit" data-p="0,0,600"><div class="lb">定制双绳包 ×1</div><img src="assets/kit1.jpg"></div></div>
+        <div class="slot"><div class="o kit" data-p="0,0,600"><div class="lb">定制T恤衫 ×2</div><img src="assets/kit2.jpg"></div></div>
+        <div class="slot"><div class="o kit" data-p="0,0,600"><div class="lb">护目镜 ×2</div><img src="assets/kit3.jpg"></div></div>
+        <div class="slot"><div class="o kit" data-p="0,0,600"><div class="lb">面巾 ×2</div><img src="assets/kit4.jpg"></div></div>
+        <div class="slot"><div class="o kit" data-p="0,0,600"><div class="lb">彩色玉米淀粉 ×1</div><img src="assets/kit5.jpg"></div></div>
+        <div class="slot"><div class="o kit" data-p="0,0,600"><div class="lb">好奇湿巾 ×1</div><img src="assets/kit6.jpg"></div></div>
+      </div>
+    </div>
+
+    <!-- D · 带娃蹦迪 -->
+    <div class="g" id="gD" data-p="13000,0,-600">
+      <div class="o pill" id="pillD" data-ax="0" data-p="-820,-350,140"><svg class="star"><use href="#star"/></svg>10月17日 20:00 · 乐队欢乐party</div>
+      <div class="o banner" id="banD" data-ax="0" data-p="-850,-222,140"><span>带娃蹦迪 享欢乐周末亲子时光</span></div>
+      <div class="o photo neon" id="party1" data-p="-330,210,40" data-r="0,9,0"><img src="assets/party1.jpg" width="900" height="439"></div>
+      <div class="o photo neon" id="party2" data-p="470,275,-200" data-r="0,-9,0"><img src="assets/party2.jpg" width="900" height="442"></div>
+      <div class="o eq" id="eq" data-p="60,640,-140"></div>
+    </div>
+
+    <!-- E · 精彩演出 -->
+    <div class="g" id="gE" data-p="17400,0,-600">
+      <div class="o pill" id="pillE" data-ax="0" data-p="-1290,-420,160"><svg class="star"><use href="#star"/></svg>周末溜娃好去处</div>
+      <div class="o banner" id="banE" data-ax="0" data-p="-1320,-285,160"><span>精彩演出不断</span></div>
+      <div class="o tile" id="tile1" data-p="-720,170,0" data-r="0,14,0"><img src="assets/show1.png" width="640"></div>
+      <div class="o tile" id="tile2" data-p="80,120,-110" data-r="0,9,0"><img src="assets/show2.png" width="650"></div>
+      <div class="o tile" id="tile3" data-p="880,175,-220" data-r="0,4,0"><img src="assets/show3.png" width="610"></div>
+      <div class="o tile" id="tile4" data-p="1660,120,-330" data-r="0,-2,0"><img src="assets/show4.png" width="630"></div>
+    </div>
+
+    <!-- F · 冰雪女王 -->
+    <div class="g" id="gF" data-p="21800,0,-600">
+      <div class="o flake" data-p="-1150,380,320"><svg width="220" height="220"><use href="#flakeShape"/></svg></div>
+      <div class="o flake" data-p="1180,-420,220"><svg width="170" height="170"><use href="#flakeShape"/></svg></div>
+      <div class="o flake" data-p="1000,560,380"><svg width="130" height="130"><use href="#flakeShape"/></svg></div>
+      <div class="o flake" data-p="-300,-620,-300"><svg width="260" height="260"><use href="#flakeShape"/></svg></div>
+      <div class="o flake" data-p="1450,120,-700"><svg width="300" height="300"><use href="#flakeShape"/></svg></div>
+      <div class="o flake" data-p="-1450,-160,-600"><svg width="280" height="280"><use href="#flakeShape"/></svg></div>
+      <div class="o pill" id="pillF" data-ax="0" data-p="-820,-350,140"><svg class="star"><use href="#star"/></svg>10月16日 19:00 · 狂欢星期五</div>
+      <div class="o banner" id="banF" data-ax="0" data-p="-850,-222,140"><span>来和冰雪女王同台飙戏</span></div>
+      <div class="o photo frost" id="frozen1" data-p="-330,210,40" data-r="0,9,0"><img src="assets/frozen1.jpg" width="900" height="439"></div>
+      <div class="o photo frost" id="frozen2" data-p="470,275,-200" data-r="0,-9,0"><img src="assets/frozen2.jpg" width="900" height="442"></div>
+    </div>
+
+    <!-- G · 双重抽奖 -->
+    <div class="g" id="gG" data-p="26200,0,-600">
+      <!-- G1 -->
+      <div class="o tc" id="g1title" data-p="0,-140,0" style="font-size:250px"><span>双</span><span>重</span><span>抽</span><span>奖</span><span>机</span><span>制</span></div>
+      <div class="o ribbon" id="g1rib" data-p="0,170,80"><svg><use href="#ribbonShape"/></svg><span>拿奖拿到手软</span></div>
+      <!-- G2 机制一 -->
+      <div class="o mech" id="mech1" data-p="0,-420,-2600"><div class="tag">机制一</div><span>10月18日 19:00 舞台定点抽奖 · 绝不空奖</span></div>
+      <div class="o glow" id="glow1" data-p="-440,20,-2760"></div>
+      <div class="o glow" id="glow2" data-p="440,20,-2760"></div>
+      <div class="o" id="phone" data-p="-440,20,-2600"><img src="assets/prize-phone.png" width="330"></div>
+      <div class="o" id="scooter" data-p="440,20,-2600"><img src="assets/prize-scooter.png" width="400"></div>
+      <div class="o medal" id="medal1" data-p="-440,300,-2540">特等奖</div>
+      <div class="o prize-name" id="pname1" data-p="-440,400,-2540">华为NOVA16手机一台</div>
+      <div class="o medal" id="medal2" data-p="440,300,-2540">一等奖</div>
+      <div class="o prize-name" id="pname2" data-p="440,400,-2540">绿驹电动车一辆</div>
+      <div class="o" id="pgroup" data-p="1780,40,-2600"><img src="assets/prize-group.png" width="600"></div>
+      <div class="o plist" id="plist" data-ax="0" data-p="2080,40,-2560">
+        <div class="row"><b>二等奖</b><span>露营5件套</span></div>
+        <div class="row"><b>三等奖</b><span>婴儿遛娃推车</span></div>
+        <div class="row"><b>四等奖</b><span>荣事达电火锅</span></div>
+        <div class="row"><b>幸运奖</b><span>抽纸一提</span></div>
+      </div>
+      <!-- G3 获券形式 + 19.9 礼包 -->
+      <div class="o pill" id="pillG3" data-ax="0" data-p="-880,-330,-5100"><svg class="star"><use href="#star"/></svg>抽奖券获取方式</div>
+      <div class="o ticket" data-ax="0" data-p="-900,-170,-5140"><b>1</b><span>购买<em>19.9元礼包</em> 送抽奖券一张</span></div>
+      <div class="o ticket" data-ax="0" data-p="-900,10,-5140"><b>2</b><span>10.1-10.18 新世界百货店消费<br>每满<em>288元</em> 送抽奖券一张</span></div>
+      <div class="o ticket" data-ax="0" data-p="-900,190,-5140"><b>3</b><span>更多抽奖券获得 咨询门店</span></div>
+      <div class="o giftcard" id="gift" data-p="520,40,-5200" data-r="0,-6,0"><div class="hd">19.9元购价值298元大礼包</div><img src="assets/gift.jpg"></div>
+      <!-- G4 机制二 -->
+      <div class="o mech" id="mech2" data-p="0,-420,-7800"><div class="tag">机制二</div><span>10月17日 消费每满288元 参与抽奖1次</span></div>
+      <img class="o rays-disc" id="raysG" data-p="600,-20,-8000" src="assets/rays-disc.png" alt="">
+      <div class="o" id="prize2" data-p="-280,120,-7800"><img src="assets/prize2-cut.png" width="1150"></div>
+      <div class="o badge" id="badge" data-p="600,-40,-7640"><svg viewBox="-100 -100 200 200" id="badgeSvg"></svg><div class="txt"><b>100%</b><span>中奖</span></div></div>
+    </div>
+
+  </div></div>
+
+  <canvas id="fxFront" width="1920" height="1080"></canvas>
+
+  <!-- screen-space overlays -->
+  <div class="layer" id="haze"></div>
+  <div class="layer" id="flare"><div class="streak"></div><div class="core"></div></div>
+  <div class="layer" id="burst"></div>
+  <div class="layer" id="stripes"></div>
+  <div class="layer" id="flash"></div>
+  <div class="layer" id="vignette"></div>
+
+  <div class="layer" id="hud">
+    <div class="logobg"></div><img class="logo" src="assets/logo-header.png" alt="孕婴世界连锁 | Biostime合生元">
+    <div class="loc">10月16-18日 · 吉安新世界广场来斯百货</div>
+    <div class="disc" id="disc1">*图片仅供参考 以现场为准</div>
+    <div class="disc" id="disc2">*图片仅供参考 以实物为准</div>
+  </div>
+
+  <div class="layer" id="lockup">
+    <img class="lg" src="assets/logo-header.png" alt="">
+    <div class="tc sm t1 qk">派星天护节</div>
+    <div class="t2"><span class="tc">亲</span><span class="tc">子</span><span class="tc">彩</span><span class="tc">虹</span><span class="tc">跑</span></div>
+    <div class="datepill">10月16-18日 · 吉安新世界广场来斯百货</div>
+    <div class="bar">
+      <img class="fl" src="assets/logo-footer.jpg" alt="孕婴世界连锁">
+      <div class="sep"></div>
+      <div class="slogan">买品质奶粉就到孕婴世界连锁<small>Buy quality milk powder to MAM&amp;BABY</small></div>
+      <img class="qr" src="assets/qr.png" alt="">
+    </div>
+  </div>
+
+</div></div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
